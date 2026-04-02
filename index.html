@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Kasir Pro + Stok Barang | Total Inventori & Laporan Laba</title>
+    <title>Kasir Pro+ | Stok, Omset, Laba, Filter Tanggal & Penyimpanan Lokal</title>
     <style>
         * {
             margin: 0;
@@ -13,8 +13,8 @@
         }
 
         body {
-            background: #f0f4f8;
-            padding: 20px;
+            background: #f1f5f9;
+            padding: 24px 20px;
         }
 
         .dashboard {
@@ -33,7 +33,7 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
         }
         .header h1 {
             font-size: 1.7rem;
@@ -44,12 +44,95 @@
         .date-box {
             background: rgba(255,255,255,0.18);
             padding: 8px 20px;
-            border-radius: 40px;
+            border-radius: 60px;
             font-weight: 500;
             backdrop-filter: blur(4px);
         }
 
-        /* Statistik Kartu Omset & Laba & Total Barang */
+        /* Storage Info Card */
+        .storage-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            border-radius: 28px;
+            padding: 16px 24px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+        }
+        .storage-info {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+        .storage-item {
+            background: rgba(255,255,255,0.12);
+            padding: 8px 20px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+        .storage-item span:first-child {
+            font-weight: 500;
+            opacity: 0.8;
+        }
+        .storage-item span:last-child {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-left: 8px;
+        }
+        .btn-reset-storage {
+            background: #ef4444;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+
+        /* Filter Range Tanggal */
+        .filter-section {
+            background: white;
+            border-radius: 28px;
+            padding: 20px 28px;
+            margin-bottom: 28px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+        .filter-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .filter-item label {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.8rem;
+        }
+        .filter-item input {
+            padding: 10px 14px;
+            border-radius: 24px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.9rem;
+        }
+        .btn-filter {
+            background: #3b82f6;
+            padding: 10px 24px;
+            border-radius: 40px;
+        }
+        .btn-reset {
+            background: #64748b;
+        }
         .stats-row {
             display: flex;
             gap: 20px;
@@ -59,22 +142,21 @@
         .stat-card {
             background: white;
             flex: 1;
-            min-width: 180px;
-            border-radius: 28px;
+            min-width: 210px;
+            border-radius: 32px;
             padding: 20px 24px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
             border-left: 8px solid;
         }
         .stat-card.omset { border-left-color: #3b82f6; }
         .stat-card.laba { border-left-color: #10b981; }
-        .stat-card.total-barang { border-left-color: #8b5cf6; }
+        .stat-card.transaksi { border-left-color: #8b5cf6; }
         .stat-card h3 {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #475569;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .stat-value {
             font-size: 2rem;
@@ -82,12 +164,11 @@
             color: #0f172a;
         }
         .stat-sub {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #64748b;
             margin-top: 8px;
         }
 
-        /* 2 kolom utama */
         .two-columns {
             display: flex;
             gap: 24px;
@@ -95,17 +176,14 @@
         }
         .col {
             flex: 1;
-            min-width: 320px;
+            min-width: 340px;
         }
-
-        /* Kartu */
         .card {
             background: white;
             border-radius: 28px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             overflow: hidden;
             margin-bottom: 24px;
-            transition: 0.2s;
         }
         .card-header {
             background: #f8fafc;
@@ -121,15 +199,13 @@
         .card-body {
             padding: 20px 24px;
         }
-
         input, select {
             width: 100%;
             padding: 12px 14px;
             border: 1px solid #cbd5e1;
-            border-radius: 20px;
+            border-radius: 24px;
             font-size: 0.95rem;
             outline: none;
-            transition: 0.2s;
         }
         input:focus, select:focus {
             border-color: #3b82f6;
@@ -153,7 +229,6 @@
         .btn-primary { background: #3b82f6; }
         .btn-success { background: #10b981; }
         .btn-danger { background: #ef4444; }
-        .btn-warning { background: #f59e0b; }
         .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
 
         table {
@@ -167,8 +242,8 @@
         }
         th { background: #f1f5f9; font-weight: 600; }
         .stock-badge {
-            padding: 4px 10px;
-            border-radius: 30px;
+            padding: 4px 12px;
+            border-radius: 40px;
             font-size: 0.75rem;
             font-weight: bold;
             display: inline-block;
@@ -177,7 +252,6 @@
         .stock-low { background: #fee2e2; color: #991b1b; }
         .stock-medium { background: #fed7aa; color: #9a3412; }
 
-        /* Keranjang */
         .cart-item {
             background: #f8fafc;
             padding: 12px 15px;
@@ -197,247 +271,228 @@
         .empty-cart { text-align: center; color: #94a3b8; padding: 30px; }
         .grand-total { font-size: 1.6rem; color: #0f172a; }
 
-        /* Modal overlay */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.65);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(5px);
         }
         .modal-container {
             background: white;
-            max-width: 650px;
-            width: 90%;
-            border-radius: 40px;
-            padding: 24px;
-            animation: fadeInUp 0.2s;
+            max-width: 800px;
+            width: 92%;
+            border-radius: 48px;
+            padding: 28px;
+            animation: fadeSlide 0.25s ease;
             max-height: 85vh;
             overflow-y: auto;
         }
-        .modal-container h3 { margin-bottom: 16px; font-size: 1.6rem; }
+        .modal-container h3 { font-size: 1.8rem; margin-bottom: 16px; }
         .history-item {
-            background: #f1f5f9;
-            border-radius: 20px;
-            padding: 12px;
-            margin-bottom: 12px;
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 6px solid #3b82f6;
         }
-        @keyframes fadeInUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
         .text-muted { color: #475569; font-size: 0.8rem; }
-        .total-stock-modal { background: #e0e7ff; border-radius: 20px; padding: 14px; margin-bottom: 16px; }
-        .badge-info { background: #dbeafe; padding: 6px 12px; border-radius: 30px; font-weight: bold; }
+        .close-modal-btn { background: #94a3b8; margin-top: 8px; width: 100%; }
+        .profit-positive { color: #10b981; font-weight: bold; }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        hr { margin: 12px 0; }
     </style>
 </head>
 <body>
 <div class="dashboard">
     <div class="header">
-        <h1>🏪 Kasir KIOS Mama ADAM</h1>
+        <h1>🏪 Kasir Pintar | Penyimpanan Lokal (LocalStorage)</h1>
         <div class="date-box" id="currentDate"></div>
     </div>
 
-    <!-- Statistik Utama: Omset, Laba, TOTAL JUMLAH SEMUA BARANG (QTY) -->
+    <!-- Storage Info Card: Menampilkan memori terpakai & sisa -->
+    <div class="storage-card" id="storageCard">
+        <div class="storage-info">
+            <div class="storage-item"><span>💾 Memori Terpakai:</span> <span id="usedMemory">0 KB</span></div>
+            <div class="storage-item"><span>📀 Sisa Memori (Estimasi):</span> <span id="remainingMemory">~5 MB</span></div>
+            <div class="storage-item"><span>📦 Total Data (JSON):</span> <span id="dataSize">0 KB</span></div>
+        </div>
+        <button id="resetAllDataBtn" class="btn-reset-storage">⚠️ Reset Semua Data (Kosongkan)</button>
+    </div>
+
+    <!-- Filter Tanggal -->
+    <div class="filter-section">
+        <div class="filter-group">
+            <div class="filter-item"><label>📅 Dari Tanggal</label><input type="date" id="startDate"></div>
+            <div class="filter-item"><label>📅 Sampai Tanggal</label><input type="date" id="endDate"></div>
+            <button id="applyFilterBtn" class="btn-filter">🔍 Tampilkan Omset & Laba</button>
+            <button id="resetFilterBtn" class="btn-reset">⟳ Reset</button>
+        </div>
+        <button id="showHistoryModalBtn" style="background:#8b5cf6;">📋 Lihat Semua Transaksi</button>
+    </div>
+
+    <!-- Statistik Filter -->
     <div class="stats-row">
-        <div class="stat-card omset">
-            <h3>💰 TOTAL OMSET</h3>
-            <div class="stat-value" id="totalOmsetDisplay">Rp 0</div>
-            <div class="stat-sub">Pendapatan kotor semua transaksi</div>
-        </div>
-        <div class="stat-card laba">
-            <h3>📈 ESTIMASI LABA</h3>
-            <div class="stat-value" id="totalLabaDisplay">Rp 0</div>
-            <div class="stat-sub">Berdasarkan harga modal</div>
-        </div>
-        <div class="stat-card total-barang">
-            <h3>📦 TOTAL STOK BARANG</h3>
-            <div class="stat-value" id="totalStockQuantityDisplay">0</div>
-            <div class="stat-sub">Jumlah keseluruhan unit barang</div>
-        </div>
-        <div class="stat-card" style="border-left-color: #f97316;">
-            <h3>🔄 TRANSAKSI</h3>
-            <div class="stat-value" id="totalTransaksiCount">0</div>
-            <div class="stat-sub">Penjualan sukses</div>
-        </div>
+        <div class="stat-card omset"><h3>💰 OMSET (Periode)</h3><div class="stat-value" id="filteredOmset">Rp 0</div><div class="stat-sub" id="filterRangeLabel">Seluruh waktu</div></div>
+        <div class="stat-card laba"><h3>📈 LABA BERSIH</h3><div class="stat-value" id="filteredLaba">Rp 0</div><div class="stat-sub">Harga Jual - Modal</div></div>
+        <div class="stat-card transaksi"><h3>🔄 JUMLAH TRANSAKSI</h3><div class="stat-value" id="filteredTransCount">0</div><div class="stat-sub">Dalam rentang tanggal</div></div>
     </div>
 
     <div class="two-columns">
-        <!-- KOLOM KIRI: KASIR + KERANJANG -->
         <div class="col">
-            <div class="card">
-                <div class="card-header">🛒 Tambah ke Transaksi</div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label>Cari / Pilih Barang</label>
-                        <select id="productSelect"></select>
-                        <div style="display: flex; gap:8px; margin-top: 10px;">
-                            <input type="text" id="searchProductInput" placeholder="Cari nama/kode..." autocomplete="off">
-                            <button id="searchProductBtn" class="btn-primary btn-sm">🔍 Cari</button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Jumlah</label>
-                        <input type="number" id="qtyInput" value="1" min="1">
-                    </div>
-                    <button id="addToCartBtn" class="btn-primary">➕ Tambah ke Keranjang</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">🛍️ Keranjang Belanja</div>
-                <div class="card-body">
-                    <div id="cartList"><div class="empty-cart">Keranjang kosong</div></div>
-                    <div id="cartSummary" style="display: none;">
-                        <div class="cart-total">
-                            <div class="flex-between">
-                                <span>Total Belanja:</span>
-                                <span class="grand-total" id="cartTotalAmount">Rp 0</span>
-                            </div>
-                        </div>
-                        <div class="action-buttons" style="display: flex; gap:12px; margin-top: 16px;">
-                            <button id="checkoutBtn" class="btn-success">✅ Bayar & Kurangi Stok</button>
-                            <button id="clearCartBtn" class="btn-danger">🗑️ Kosongkan</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Tombol untuk menampilkan MODAL TOTAL SEMUA BARANG + RINGKASAN INVENTORI -->
-            <div class="card">
-                <div class="card-header">📊 Laporan & Detail Inventori</div>
-                <div class="card-body">
-                    <button id="showInventoryModalBtn" style="background:#8b5cf6; width:100%;">📦 Lihat TOTAL SEMUA BARANG & Modal Stok</button>
-                    <p class="text-muted" style="margin-top: 12px;">Klik untuk melihat rincian jumlah setiap barang, total unit, nilai inventori (harga modal & jual).</p>
-                </div>
-            </div>
+            <div class="card"><div class="card-header">🛒 Tambah ke Transaksi</div><div class="card-body">
+                <select id="productSelect"></select>
+                <div style="display:flex; gap:8px; margin-top:12px;"><input type="text" id="searchProductInput" placeholder="Cari barang..."><button id="searchProductBtn" class="btn-primary btn-sm">🔍</button></div>
+                <div class="form-group" style="margin-top:12px;"><label>Jumlah</label><input type="number" id="qtyInput" value="1" min="1"></div>
+                <button id="addToCartBtn" class="btn-primary">➕ Tambah ke Keranjang</button>
+            </div></div>
+            <div class="card"><div class="card-header">🛍️ Keranjang Belanja</div><div class="card-body">
+                <div id="cartList"><div class="empty-cart">Keranjang kosong</div></div>
+                <div id="cartSummary" style="display: none;"><div class="cart-total"><div class="flex-between"><span>Total Belanja:</span><span class="grand-total" id="cartTotalAmount">Rp 0</span></div></div>
+                <div style="display:flex; gap:12px; margin-top:18px;"><button id="checkoutBtn" class="btn-success">✅ Bayar & Kurangi Stok</button><button id="clearCartBtn" class="btn-danger">🗑️ Kosongkan</button></div></div>
+            </div></div>
         </div>
-
-        <!-- KOLOM KANAN: STOK BARANG & EDIT -->
         <div class="col">
-            <div class="card">
-                <div class="card-header">
-                    📦 Manajemen Stok Barang
-                    <button id="openAddProductModalBtn" style="margin-left: auto; background:#10b981;" class="btn-sm">+ Barang Baru</button>
-                </div>
-                <div class="card-body">
-                    <div class="table-wrapper" style="overflow-x: auto;">
-                        <table id="stockTable">
-                            <thead><tr><th>Kode</th><th>Nama</th><th>Harga Jual</th><th>Modal</th><th>Stok</th><th>Aksi</th></tr></thead>
-                            <tbody id="stockTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            <div class="card"><div class="card-header">📦 Stok Barang + Harga Modal <button id="openAddProductModalBtn" style="margin-left:auto; background:#10b981;" class="btn-sm">+ Barang Baru</button></div>
+            <div class="card-body"><div class="table-wrapper"><table style="min-width:550px;"><thead><tr><th>Kode</th><th>Nama</th><th>Harga Jual</th><th>Modal</th><th>Stok</th><th>Aksi</th></tr></thead><tbody id="stockTableBody"></tbody></table></div></div></div>
         </div>
     </div>
 </div>
 
-<!-- MODAL TAMBAH/EDIT BARANG (dengan field modal/cost) -->
-<div id="productModal" class="modal-overlay">
-    <div class="modal-container">
-        <h3 id="modalTitle">Tambah / Edit Barang</h3>
-        <input type="hidden" id="editId">
-        <div class="form-group"><label>Kode Barang</label><input id="modalCode" placeholder="Kode unik"></div>
-        <div class="form-group"><label>Nama Barang</label><input id="modalName" placeholder="Nama produk"></div>
-        <div class="form-group"><label>Harga Jual (Rp)</label><input id="modalPrice" type="number" placeholder="Harga jual"></div>
-        <div class="form-group"><label>Harga Modal / Pokok (Rp)</label><input id="modalCost" type="number" placeholder="Modal barang" value="0"></div>
-        <div class="form-group"><label>Stok</label><input id="modalStock" type="number" placeholder="Jumlah stok"></div>
-        <div style="display: flex; gap:12px; justify-content: flex-end;">
-            <button id="closeModalBtn" class="close-modal-btn" style="background:#94a3b8;">Batal</button>
-            <button id="saveProductBtn" style="background:#3b82f6;">Simpan</button>
-        </div>
-    </div>
-</div>
+<!-- Modal Produk -->
+<div id="productModal" class="modal-overlay"><div class="modal-container"><h3 id="modalTitle">Tambah Barang</h3><input type="hidden" id="editId"><div class="form-group"><label>Kode</label><input id="modalCode"></div><div class="form-group"><label>Nama</label><input id="modalName"></div><div class="form-group"><label>Harga Jual</label><input id="modalPrice" type="number"></div><div class="form-group"><label>Harga Modal</label><input id="modalCost" type="number" value="0"></div><div class="form-group"><label>Stok</label><input id="modalStock" type="number"></div><div style="display:flex; gap:12px; justify-content:flex-end;"><button id="closeModalBtn" class="close-modal-btn">Batal</button><button id="saveProductBtn" style="background:#3b82f6;">Simpan</button></div></div></div>
 
-<!-- MODAL INVENTORI & TOTAL JUMLAH SEMUA BARANG (detail) -->
-<div id="inventoryModal" class="modal-overlay">
-    <div class="modal-container" style="max-width: 700px;">
-        <h3>📦 Total Seluruh Barang & Nilai Inventori</h3>
-        <div id="inventoryDetail" style="max-height: 400px; overflow-y: auto; margin-bottom: 16px;"></div>
-        <div class="total-stock-modal flex-between" style="background:#e0e7ff;">
-            <span><strong>📊 TOTAL UNIT (Semua Barang):</strong></span>
-            <span class="badge-info" id="modalTotalUnits">0</span>
-        </div>
-        <div class="total-stock-modal flex-between" style="background:#dcfce7;">
-            <span><strong>💰 Total Nilai Modal (HPP):</strong></span>
-            <span id="modalTotalCostValue">Rp 0</span>
-        </div>
-        <div class="total-stock-modal flex-between" style="background:#fed7aa;">
-            <span><strong>💵 Total Nilai Jual (Potensi Omset):</strong></span>
-            <span id="modalTotalSellValue">Rp 0</span>
-        </div>
-        <div class="flex-between text-muted" style="margin: 10px 0;">
-            <span>📋 Rincian per barang (stok x harga jual / modal)</span>
-        </div>
-        <button id="closeInventoryBtn" class="close-modal-btn" style="width:100%; background:#3b82f6;">Tutup</button>
-    </div>
-</div>
-
-<!-- MODAL RIWAYAT TRANSAKSI (Omset & Laba Detail) opsional -->
-<div id="historyModal" class="modal-overlay">
-    <div class="modal-container" style="max-width: 700px;">
-        <h3>📋 Riwayat Transaksi & Laba</h3>
-        <div id="historyList" style="max-height: 400px; overflow-y: auto;"></div>
-        <div style="margin-top: 16px; background:#f1f5f9; padding: 12px; border-radius: 24px;">
-            <div class="flex-between"><strong>Total Omset:</strong> <span id="modalOmsetTotal">Rp 0</span></div>
-            <div class="flex-between"><strong>Total Laba:</strong> <span id="modalLabaTotal">Rp 0</span></div>
-            <div class="flex-between"><strong>Jumlah Transaksi:</strong> <span id="modalTransCount">0</span></div>
-        </div>
-        <button id="closeHistoryBtn" class="close-modal-btn" style="margin-top: 20px;">Tutup</button>
-    </div>
-</div>
+<!-- Modal Riwayat Transaksi -->
+<div id="historyModal" class="modal-overlay"><div class="modal-container"><h3>📜 Semua Transaksi & Detail</h3><div id="historyList" style="max-height:460px; overflow-y:auto;"></div><div style="background:#f1f5f9; padding:16px; border-radius:28px;"><div class="flex-between"><strong>Total Omset Semua Waktu:</strong> <span id="allTimeOmset">Rp 0</span></div><div class="flex-between"><strong>Total Laba Semua Waktu:</strong> <span id="allTimeLaba">Rp 0</span></div><div class="flex-between"><strong>Total Transaksi:</strong> <span id="allTimeTransCount">0</span></div></div><button id="closeHistoryBtn" class="close-modal-btn">Tutup</button></div></div>
 
 <script>
-    // ---------- DATA PRODUK (dengan cost) ----------
-    let products = [
-        { id: "p1", code: "BRG001", name: "Indomie Goreng", price: 3500, cost: 2800, stock: 45 },
-        { id: "p2", code: "BRG002", name: "Aqua 600ml", price: 3000, cost: 2200, stock: 30 },
-        { id: "p3", code: "BRG003", name: "Roti Tawar", price: 12000, cost: 9000, stock: 12 },
-        { id: "p4", code: "BRG004", name: "Sabun Lifebuoy", price: 4500, cost: 3700, stock: 8 },
-        { id: "p5", code: "BRG005", name: "Beras 5kg", price: 65000, cost: 58000, stock: 5 }
-    ];
-
+    // ---------------------- GLOBAL DATA --------------------------
+    let products = [];      // akan diisi dari localStorage atau default
     let transactionHistory = [];
     let cart = [];
 
-    // Helper
+    // ---------------------- FUNGSI PENYIMPANAN & MEMORI -----------------
+    function saveToLocalStorage() {
+        const data = { products, transactionHistory };
+        localStorage.setItem('kasir_app_data', JSON.stringify(data));
+        updateStorageDisplay();   // update tampilan memori setiap kali simpan
+    }
+
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem('kasir_app_data');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                products = parsed.products || [];
+                transactionHistory = parsed.transactionHistory || [];
+                // validasi jika kosong, beri default
+                if (products.length === 0) setDefaultProducts();
+            } catch(e) { setDefaultProducts(); }
+        } else {
+            setDefaultProducts();
+            // default transaksi sample (agar filter terlihat)
+            setSampleTransactions();
+        }
+        // pastikan setiap product memiliki field cost
+        products.forEach(p => { if(p.cost === undefined) p.cost = 0; });
+        saveToLocalStorage(); // sinkron
+    }
+
+    function setDefaultProducts() {
+        products = [
+            { id: "p1", code: "BRG001", name: "Indomie Goreng", price: 3500, cost: 2800, stock: 45 },
+            { id: "p2", code: "BRG002", name: "Aqua 600ml", price: 3000, cost: 2200, stock: 30 },
+            { id: "p3", code: "BRG003", name: "Roti Tawar", price: 12000, cost: 9000, stock: 12 },
+            { id: "p4", code: "BRG004", name: "Sabun Lifebuoy", price: 4500, cost: 3700, stock: 8 },
+            { id: "p5", code: "BRG005", name: "Beras 5kg", price: 65000, cost: 58000, stock: 5 }
+        ];
+    }
+
+    function setSampleTransactions() {
+        const today = new Date();
+        const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+        const twoDaysAgo = new Date(today); twoDaysAgo.setDate(today.getDate() - 2);
+        transactionHistory = [
+            { id: "tr1", date: twoDaysAgo.toISOString(), dateDisplay: twoDaysAgo.toLocaleDateString('id-ID')+" 10:23", totalOmset: 35000, totalLaba: 7000, items: [{ name: "Indomie Goreng", qty: 10, price: 3500, cost: 2800, subtotal: 35000, laba: 7000 }] },
+            { id: "tr2", date: yesterday.toISOString(), dateDisplay: yesterday.toLocaleDateString('id-ID')+" 14:15", totalOmset: 12000, totalLaba: 3000, items: [{ name: "Roti Tawar", qty: 1, price: 12000, cost: 9000, subtotal: 12000, laba: 3000 }] },
+            { id: "tr3", date: today.toISOString(), dateDisplay: today.toLocaleDateString('id-ID')+" 09:45", totalOmset: 65000, totalLaba: 7000, items: [{ name: "Beras 5kg", qty: 1, price: 65000, cost: 58000, subtotal: 65000, laba: 7000 }] },
+            { id: "tr4", date: today.toISOString(), dateDisplay: today.toLocaleDateString('id-ID')+" 12:30", totalOmset: 9000, totalLaba: 2400, items: [{ name: "Aqua 600ml", qty: 3, price: 3000, cost: 2200, subtotal: 9000, laba: 2400 }] }
+        ];
+    }
+
+    // Hitung dan tampilkan penggunaan memori (LocalStorage)
+    function updateStorageDisplay() {
+        try {
+            const data = { products, transactionHistory };
+            const jsonStr = JSON.stringify(data);
+            const sizeInBytes = new Blob([jsonStr]).size;
+            const sizeInKB = (sizeInBytes / 1024).toFixed(2);
+            document.getElementById('usedMemory').innerText = `${sizeInKB} KB`;
+            document.getElementById('dataSize').innerText = `${sizeInKB} KB`;
+            // Estimasi kuota localStorage biasanya ~5-10MB, kita tampilkan sisa estimasi (max 5MB)
+            const maxStorageMB = 5; // asumsi batas umum 5MB untuk keamanan tampilan
+            const usedMB = sizeInBytes / (1024 * 1024);
+            const remainingMB = (maxStorageMB - usedMB).toFixed(2);
+            document.getElementById('remainingMemory').innerText = `~${remainingMB} MB (dari ~5 MB)`;
+            if (sizeInKB > 4000) document.getElementById('remainingMemory').style.color = "#facc15";
+            else document.getElementById('remainingMemory').style.color = "#a5f3fc";
+        } catch(e) {
+            document.getElementById('usedMemory').innerText = "Tidak tersedia";
+        }
+    }
+
+    // Reset semua data (localStorage clear + reload default)
+    function resetAllData() {
+        if(confirm("⚠️ PERINGATAN: Ini akan menghapus SEMUA produk, riwayat transaksi, dan keranjang. Data tidak dapat dikembalikan. Lanjutkan?")) {
+            localStorage.removeItem('kasir_app_data');
+            setDefaultProducts();
+            setSampleTransactions();
+            cart = [];
+            saveToLocalStorage();
+            renderAll();
+            updateStorageDisplay();
+            showToast("Semua data telah direset ke default!", "success");
+        }
+    }
+
+    // ---------------------- LOGIKA BISNIS --------------------------
     function generateId() { return Date.now().toString(36) + Math.random().toString(36).substring(2); }
     function formatNumber(num) { return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."); }
     function formatRupiah(amount) { return 'Rp ' + formatNumber(amount); }
 
-    // Hitung total omset & laba dari history
-    function calculateTotals() {
-        let totalOmset = 0, totalLaba = 0;
-        transactionHistory.forEach(tr => {
-            totalOmset += tr.totalOmset;
-            totalLaba += tr.totalLaba;
-        });
-        return { totalOmset, totalLaba, totalTransaksi: transactionHistory.length };
+    function getFilteredTransactions() {
+        let start = document.getElementById('startDate').value;
+        let end = document.getElementById('endDate').value;
+        let filtered = [...transactionHistory];
+        if (start) { const startDate = new Date(start); startDate.setHours(0,0,0,0); filtered = filtered.filter(tr => new Date(tr.date) >= startDate); }
+        if (end) { const endDate = new Date(end); endDate.setHours(23,59,59,999); filtered = filtered.filter(tr => new Date(tr.date) <= endDate); }
+        return filtered;
     }
 
-    // Hitung TOTAL JUMLAH SEMUA BARANG (quantity stok)
-    function calculateTotalStockQuantity() {
-        return products.reduce((sum, prod) => sum + (prod.stock || 0), 0);
+    function updateFilteredStats() {
+        const filtered = getFilteredTransactions();
+        let omset = 0, laba = 0;
+        filtered.forEach(tr => { omset += tr.totalOmset; laba += tr.totalLaba; });
+        document.getElementById('filteredOmset').innerText = formatRupiah(omset);
+        document.getElementById('filteredLaba').innerText = formatRupiah(laba);
+        document.getElementById('filteredTransCount').innerText = filtered.length;
+        let rangeText = "Seluruh waktu";
+        if (document.getElementById('startDate').value || document.getElementById('endDate').value) {
+            rangeText = `${document.getElementById('startDate').value || "awal"} s/d ${document.getElementById('endDate').value || "sekarang"}`;
+        }
+        document.getElementById('filterRangeLabel').innerHTML = rangeText;
     }
 
-    // Update semua statistik di dashboard (termasuk total stok)
-    function updateStatsUI() {
-        const { totalOmset, totalLaba, totalTransaksi } = calculateTotals();
-        document.getElementById('totalOmsetDisplay').innerText = formatRupiah(totalOmset);
-        document.getElementById('totalLabaDisplay').innerText = formatRupiah(totalLaba);
-        document.getElementById('totalTransaksiCount').innerText = totalTransaksi;
-        const totalStockQty = calculateTotalStockQuantity();
-        document.getElementById('totalStockQuantityDisplay').innerText = totalStockQty;
-    }
-
-    // Render tabel stok
     function renderStockTable() {
         const tbody = document.getElementById('stockTableBody');
-        if (!products.length) { tbody.innerHTML = '<tr><td colspan="6">Tidak ada data</td></tr>'; return; }
+        if (!products.length) { tbody.innerHTML = '<tr><td colspan="6">Tidak ada data</tr>'; return; }
         tbody.innerHTML = '';
         products.forEach(prod => {
             const row = tbody.insertRow();
@@ -449,57 +504,39 @@
             row.insertCell(4).innerHTML = `<span class="stock-badge ${stockClass}">${prod.stock}</span>`;
             const actionCell = row.insertCell(5);
             actionCell.innerHTML = `<button class="btn-sm edit-product" data-id="${prod.id}" style="background:#3b82f6;">✏️ Edit</button>
-                                     <button class="btn-sm delete-product" data-id="${prod.id}" style="background:#ef4444; margin-left:6px;">🗑️</button>`;
+                                     <button class="btn-sm delete-product" data-id="${prod.id}" style="background:#ef4444; margin-left:8px;">🗑️</button>`;
         });
-        document.querySelectorAll('.edit-product').forEach(btn => {
-            btn.addEventListener('click', (e) => { openEditModal(btn.getAttribute('data-id')); });
-        });
-        document.querySelectorAll('.delete-product').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                if(confirm('Hapus barang? Data akan hilang dari stok.')) {
-                    const id = btn.getAttribute('data-id');
-                    products = products.filter(p => p.id !== id);
-                    cart = cart.filter(item => item.productId !== id);
-                    renderAll();
-                    showToast('Barang dihapus', 'danger');
-                }
-            });
-        });
+        document.querySelectorAll('.edit-product').forEach(btn => btn.addEventListener('click', (e) => openEditModal(btn.getAttribute('data-id'))));
+        document.querySelectorAll('.delete-product').forEach(btn => btn.addEventListener('click', (e) => {
+            if(confirm('Hapus barang?')) { const id = btn.getAttribute('data-id'); products = products.filter(p => p.id !== id); cart = cart.filter(item => item.productId !== id); saveToLocalStorage(); renderAll(); showToast('Barang dihapus','danger');}
+        }));
     }
 
     function renderProductSelect() {
         const select = document.getElementById('productSelect');
         select.innerHTML = '<option value="">-- Pilih Barang --</option>';
         products.forEach(prod => {
-            const option = document.createElement('option');
-            option.value = prod.id;
-            option.textContent = `${prod.code} - ${prod.name} (Stok:${prod.stock}) | Jual: ${formatRupiah(prod.price)}`;
-            select.appendChild(option);
+            const opt = document.createElement('option');
+            opt.value = prod.id;
+            opt.textContent = `${prod.code} - ${prod.name} | Stok:${prod.stock} | Jual:${formatRupiah(prod.price)} | Modal:${formatRupiah(prod.cost)}`;
+            select.appendChild(opt);
         });
     }
 
     function renderCart() {
         const cartDiv = document.getElementById('cartList');
         const summaryDiv = document.getElementById('cartSummary');
-        if (!cart.length) {
-            cartDiv.innerHTML = '<div class="empty-cart">Keranjang kosong</div>';
-            summaryDiv.style.display = 'none';
-            return;
-        }
+        if (!cart.length) { cartDiv.innerHTML = '<div class="empty-cart">Keranjang kosong</div>'; summaryDiv.style.display = 'none'; return; }
         summaryDiv.style.display = 'block';
         let html = '', total = 0;
         cart.forEach((item, idx) => {
             const subtotal = item.price * item.qty;
             total += subtotal;
-            html += `<div class="cart-item">
-                        <div><strong>${item.name}</strong><br>${formatRupiah(item.price)} x ${item.qty} = ${formatRupiah(subtotal)}</div>
-                        <div style="display:flex; gap:6px;">
-                            <button class="btn-sm cart-qty-minus" data-index="${idx}" style="background:#f59e0b;">-</button>
-                            <span>${item.qty}</span>
-                            <button class="btn-sm cart-qty-plus" data-index="${idx}" style="background:#10b981;">+</button>
-                            <button class="btn-sm cart-remove" data-index="${idx}" style="background:#ef4444;">✖</button>
-                        </div>
-                    </div>`;
+            html += `<div class="cart-item"><div><strong>${item.name}</strong><br>${formatRupiah(item.price)} x ${item.qty} = ${formatRupiah(subtotal)}</div>
+                    <div><button class="btn-sm cart-qty-minus" data-index="${idx}" style="background:#f59e0b;">-</button>
+                    <span style="margin:0 6px;">${item.qty}</span>
+                    <button class="btn-sm cart-qty-plus" data-index="${idx}" style="background:#10b981;">+</button>
+                    <button class="btn-sm cart-remove" data-index="${idx}" style="background:#ef4444;">✖</button></div></div>`;
         });
         cartDiv.innerHTML = html;
         document.getElementById('cartTotalAmount').innerHTML = formatRupiah(total);
@@ -507,244 +544,109 @@
     }
 
     function attachCartEvents() {
-        document.querySelectorAll('.cart-qty-minus').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = parseInt(btn.getAttribute('data-index'));
-                if (cart[idx].qty > 1) cart[idx].qty--;
-                else cart.splice(idx, 1);
-                renderAll();
-            });
-        });
-        document.querySelectorAll('.cart-qty-plus').forEach(btn => {
-            const idx = parseInt(btn.getAttribute('data-index'));
-            btn.addEventListener('click', () => {
-                const prod = products.find(p => p.id === cart[idx].productId);
-                if (prod && cart[idx].qty < prod.stock) cart[idx].qty++;
-                else alert(`Stok tidak cukup! Sisa: ${prod ? prod.stock : 0}`);
-                renderAll();
-            });
-        });
-        document.querySelectorAll('.cart-remove').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = parseInt(btn.getAttribute('data-index'));
-                cart.splice(idx, 1);
-                renderAll();
-            });
-        });
+        document.querySelectorAll('.cart-qty-minus').forEach(btn => btn.addEventListener('click', (e) => {
+            const idx = parseInt(btn.getAttribute('data-index')); if (cart[idx].qty > 1) cart[idx].qty--; else cart.splice(idx,1); renderAll(); saveToLocalStorage();
+        }));
+        document.querySelectorAll('.cart-qty-plus').forEach(btn => btn.addEventListener('click', (e) => {
+            const idx = parseInt(btn.getAttribute('data-index')); const prod = products.find(p => p.id === cart[idx].productId);
+            if (prod && cart[idx].qty < prod.stock) cart[idx].qty++; else alert(`Stok tidak cukup! Sisa: ${prod ? prod.stock : 0}`);
+            renderAll(); saveToLocalStorage();
+        }));
+        document.querySelectorAll('.cart-remove').forEach(btn => btn.addEventListener('click', (e) => {
+            const idx = parseInt(btn.getAttribute('data-index')); cart.splice(idx,1); renderAll(); saveToLocalStorage();
+        }));
     }
 
     function checkout() {
-        if (cart.length === 0) { alert('Keranjang kosong.'); return; }
-        for (let item of cart) {
-            const prod = products.find(p => p.id === item.productId);
-            if (!prod || prod.stock < item.qty) {
-                alert(`Stok ${item.name} tidak cukup! (tersisa ${prod ? prod.stock : 0})`);
-                return;
-            }
-        }
-        let transactionItems = [];
-        let totalOmset = 0, totalLaba = 0;
+        if (cart.length === 0) { alert('Keranjang kosong'); return; }
+        for (let item of cart) { const prod = products.find(p => p.id === item.productId); if (!prod || prod.stock < item.qty) { alert(`Stok ${item.name} tidak cukup`); return; } }
+        let transactionItems = [], totalOmset = 0, totalLaba = 0;
         for (let item of cart) {
             const prod = products.find(p => p.id === item.productId);
             const subTotal = prod.price * item.qty;
             const subCost = (prod.cost || 0) * item.qty;
             const labaItem = subTotal - subCost;
-            totalOmset += subTotal;
-            totalLaba += labaItem;
-            transactionItems.push({
-                productId: prod.id, name: prod.name, qty: item.qty,
-                price: prod.price, cost: prod.cost || 0, subtotal: subTotal, laba: labaItem
-            });
+            totalOmset += subTotal; totalLaba += labaItem;
+            transactionItems.push({ name: prod.name, qty: item.qty, price: prod.price, cost: prod.cost, subtotal: subTotal, laba: labaItem });
             prod.stock -= item.qty;
         }
-        transactionHistory.unshift({
-            id: generateId(), date: new Date().toLocaleString('id-ID'),
-            items: transactionItems, totalOmset, totalLaba
-        });
+        const newTransaction = {
+            id: generateId(),
+            date: new Date().toISOString(),
+            dateDisplay: new Date().toLocaleString('id-ID'),
+            totalOmset, totalLaba, items: transactionItems
+        };
+        transactionHistory.unshift(newTransaction);
         cart = [];
+        saveToLocalStorage();
         renderAll();
-        updateStatsUI();
-        showToast(`Transaksi sukses! Omset: ${formatRupiah(totalOmset)}, Laba: ${formatRupiah(totalLaba)}`, 'success');
+        updateFilteredStats();
+        showToast(`Transaksi sukses! Omset: ${formatRupiah(totalOmset)} Laba: ${formatRupiah(totalLaba)}`, 'success');
     }
 
     function addToCart() {
         const productId = document.getElementById('productSelect').value;
-        if (!productId) { alert('Pilih barang dulu'); return; }
+        if (!productId) { alert('Pilih barang'); return; }
         const product = products.find(p => p.id === productId);
-        if (!product) return;
         let qty = parseInt(document.getElementById('qtyInput').value);
         if (isNaN(qty) || qty < 1) qty = 1;
-        if (qty > product.stock) { alert(`Stok hanya ${product.stock}`); return; }
+        if (qty > product.stock) { alert(`Stok tersisa ${product.stock}`); return; }
         const existing = cart.findIndex(i => i.productId === product.id);
-        if (existing !== -1) {
-            const newQty = cart[existing].qty + qty;
-            if (newQty > product.stock) { alert(`Total melebihi stok (${product.stock})`); return; }
-            cart[existing].qty = newQty;
-        } else {
-            cart.push({ productId: product.id, name: product.name, price: product.price, qty: qty, cost: product.cost });
-        }
-        renderAll();
+        if (existing !== -1) { const newQty = cart[existing].qty + qty; if (newQty > product.stock) { alert(`Melebihi stok`); return; } cart[existing].qty = newQty; }
+        else { cart.push({ productId: product.id, name: product.name, price: product.price, qty: qty, cost: product.cost }); }
+        renderAll(); saveToLocalStorage();
         document.getElementById('qtyInput').value = 1;
         showToast(`${product.name} ditambahkan`, 'success');
     }
 
-    function filterProductSelect() {
+    function filterProductSelect() { 
         const keyword = document.getElementById('searchProductInput').value.toLowerCase();
         const select = document.getElementById('productSelect');
         select.innerHTML = '<option value="">-- Pilih Barang --</option>';
-        products.forEach(prod => {
-            if (prod.name.toLowerCase().includes(keyword) || prod.code.toLowerCase().includes(keyword) || keyword === '') {
-                const opt = document.createElement('option');
-                opt.value = prod.id;
-                opt.textContent = `${prod.code} - ${prod.name} (Stok:${prod.stock}) | ${formatRupiah(prod.price)}`;
-                select.appendChild(opt);
-            }
-        });
-        if(select.options.length===1) select.innerHTML = '<option>-- Tidak ditemukan --</option>';
+        products.forEach(prod => { if (prod.name.toLowerCase().includes(keyword) || prod.code.toLowerCase().includes(keyword) || keyword === '') { const opt = document.createElement('option'); opt.value = prod.id; opt.textContent = `${prod.code} - ${prod.name} (Stok:${prod.stock})`; select.appendChild(opt); } });
     }
 
-    // MODAL INVENTORI: Menampilkan TOTAL JUMLAH SEMUA BARANG (per unit + total nilai)
-    function showInventoryModal() {
-        const totalUnits = calculateTotalStockQuantity();
-        let totalCostValue = 0;
-        let totalSellValue = 0;
-        let detailHtml = `<table style="width:100%; font-size:0.85rem;"><thead><tr><th>Barang</th><th>Stok</th><th>Harga Modal</th><th>Total Modal</th><th>Harga Jual</th><th>Total Jual</th></tr></thead><tbody>`;
-        products.forEach(prod => {
-            const totalCostItem = (prod.cost || 0) * prod.stock;
-            const totalSellItem = prod.price * prod.stock;
-            totalCostValue += totalCostItem;
-            totalSellValue += totalSellItem;
-            detailHtml += `<tr>
-                <td>${prod.name} (${prod.code})</td>
-                <td><strong>${prod.stock}</strong></td>
-                <td>${formatRupiah(prod.cost || 0)}</td>
-                <td>${formatRupiah(totalCostItem)}</td>
-                <td>${formatRupiah(prod.price)}</td>
-                <td>${formatRupiah(totalSellItem)}</td>
-            </tr>`;
-        });
-        detailHtml += `</tbody></table>`;
-        document.getElementById('inventoryDetail').innerHTML = detailHtml;
-        document.getElementById('modalTotalUnits').innerText = totalUnits;
-        document.getElementById('modalTotalCostValue').innerText = formatRupiah(totalCostValue);
-        document.getElementById('modalTotalSellValue').innerText = formatRupiah(totalSellValue);
-        document.getElementById('inventoryModal').style.display = 'flex';
+    function openAddModal() { document.getElementById('modalTitle').innerText = 'Tambah Barang Baru'; document.getElementById('editId').value = ''; ['modalCode','modalName','modalPrice','modalCost','modalStock'].forEach(id=>document.getElementById(id).value=''); document.getElementById('modalCost').value='0'; document.getElementById('productModal').style.display='flex'; }
+    function openEditModal(id) { const prod=products.find(p=>p.id===id); if(!prod) return; document.getElementById('modalTitle').innerText='Edit Barang'; document.getElementById('editId').value=prod.id; document.getElementById('modalCode').value=prod.code; document.getElementById('modalName').value=prod.name; document.getElementById('modalPrice').value=prod.price; document.getElementById('modalCost').value=prod.cost||0; document.getElementById('modalStock').value=prod.stock; document.getElementById('productModal').style.display='flex'; }
+    function saveProduct() { 
+        const id=document.getElementById('editId').value; const code=document.getElementById('modalCode').value.trim(); const name=document.getElementById('modalName').value.trim(); let price=parseInt(document.getElementById('modalPrice').value); let cost=parseInt(document.getElementById('modalCost').value); let stock=parseInt(document.getElementById('modalStock').value); if(!code||!name||isNaN(price)||isNaN(stock)){ alert('Lengkapi data'); return; } if(price<0)price=0; if(cost<0)cost=0; if(stock<0)stock=0;
+        if(id){ const idx=products.findIndex(p=>p.id===id); if(idx!==-1){ if(products.some(p=>p.code===code && p.id!==id)){ alert('Kode duplikat'); return; } products[idx]={...products[idx],code,name,price,cost,stock}; cart=cart.filter(item=>item.productId!==id); showToast('Produk diupdate','success'); } }
+        else { if(products.some(p=>p.code===code)){ alert('Kode sudah ada'); return; } products.push({id:generateId(),code,name,price,cost,stock}); showToast('Barang ditambahkan','success'); }
+        closeModal(); saveToLocalStorage(); renderAll(); 
     }
-
-    function closeInventoryModal() { document.getElementById('inventoryModal').style.display = 'none'; }
-
-    // Modal produk
-    function openAddModal() {
-        document.getElementById('modalTitle').innerText = 'Tambah Barang Baru';
-        document.getElementById('editId').value = '';
-        document.getElementById('modalCode').value = '';
-        document.getElementById('modalName').value = '';
-        document.getElementById('modalPrice').value = '';
-        document.getElementById('modalCost').value = '0';
-        document.getElementById('modalStock').value = '';
-        document.getElementById('productModal').style.display = 'flex';
-    }
-    function openEditModal(id) {
-        const prod = products.find(p => p.id === id);
-        if(!prod) return;
-        document.getElementById('modalTitle').innerText = 'Edit Barang';
-        document.getElementById('editId').value = prod.id;
-        document.getElementById('modalCode').value = prod.code;
-        document.getElementById('modalName').value = prod.name;
-        document.getElementById('modalPrice').value = prod.price;
-        document.getElementById('modalCost').value = prod.cost || 0;
-        document.getElementById('modalStock').value = prod.stock;
-        document.getElementById('productModal').style.display = 'flex';
-    }
-    function saveProduct() {
-        const id = document.getElementById('editId').value;
-        const code = document.getElementById('modalCode').value.trim();
-        const name = document.getElementById('modalName').value.trim();
-        let price = parseInt(document.getElementById('modalPrice').value);
-        let cost = parseInt(document.getElementById('modalCost').value);
-        let stock = parseInt(document.getElementById('modalStock').value);
-        if(!code || !name || isNaN(price) || isNaN(stock)) { alert('Lengkapi data (kode, nama, harga, stok)'); return; }
-        if(price<0) price=0; if(cost<0) cost=0; if(stock<0) stock=0;
-        if(id){
-            const idx = products.findIndex(p => p.id === id);
-            if(idx !== -1){
-                const duplicate = products.some(p => p.code === code && p.id !== id);
-                if(duplicate){ alert('Kode sudah dipakai'); return; }
-                products[idx] = {...products[idx], code, name, price, cost, stock};
-                cart = cart.filter(item => item.productId !== id);
-                showToast('Produk diupdate', 'success');
-            }
-        } else {
-            if(products.some(p=>p.code===code)){ alert('Kode barang sudah ada'); return; }
-            products.push({ id: generateId(), code, name, price, cost, stock });
-            showToast('Barang baru ditambahkan', 'success');
-        }
-        closeProductModal();
-        renderAll();
-    }
-    function closeProductModal() { document.getElementById('productModal').style.display = 'none'; }
-    function clearCart() { if(cart.length && confirm('Kosongkan keranjang?')) { cart = []; renderAll(); } }
-
-    // history tambahan (optional)
+    function closeModal() { document.getElementById('productModal').style.display='none'; }
     function showHistoryModal() {
         const historyDiv = document.getElementById('historyList');
-        if(transactionHistory.length === 0) historyDiv.innerHTML = '<div style="padding:20px; text-align:center;">Belum ada transaksi</div>';
-        else {
-            let html = '';
-            transactionHistory.forEach(tr => {
-                html += `<div class="history-item">
-                            <div class="flex-between"><strong>🕘 ${tr.date}</strong> <span>Omset: ${formatRupiah(tr.totalOmset)}</span></div>
-                            <div class="flex-between"><span>Laba: ${formatRupiah(tr.totalLaba)}</span> <span class="text-muted">Margin: ${Math.round((tr.totalLaba/tr.totalOmset)*100)}%</span></div>
-                            <div style="font-size:0.8rem;">${tr.items.map(i=>`${i.name} x${i.qty}`).join(', ')}</div>
-                         </div>`;
-            });
-            historyDiv.innerHTML = html;
-        }
-        const { totalOmset, totalLaba, totalTransaksi } = calculateTotals();
-        document.getElementById('modalOmsetTotal').innerText = formatRupiah(totalOmset);
-        document.getElementById('modalLabaTotal').innerText = formatRupiah(totalLaba);
-        document.getElementById('modalTransCount').innerText = totalTransaksi;
-        document.getElementById('historyModal').style.display = 'flex';
+        if(transactionHistory.length===0) historyDiv.innerHTML = '<div style="padding:20px;text-align:center;">Belum ada transaksi</div>';
+        else { let html=''; transactionHistory.forEach(tr => { html+=`<div class="history-item"><div class="flex-between"><strong>📅 ${tr.dateDisplay}</strong><span>Omset: ${formatRupiah(tr.totalOmset)}</span></div><div>Laba: ${formatRupiah(tr.totalLaba)} | Margin: ${tr.totalOmset>0?((tr.totalLaba/tr.totalOmset)*100).toFixed(1):0}%</div><hr><div>${tr.items.map(i=>`${i.name} x${i.qty} = ${formatRupiah(i.subtotal)} (laba: ${formatRupiah(i.laba)})<br><span class="text-muted">Modal/unit: ${formatRupiah(i.cost)}</span>`).join('<br>')}</div></div>`; }); historyDiv.innerHTML = html; }
+        const allOmset = transactionHistory.reduce((a,b)=>a+b.totalOmset,0); const allLaba = transactionHistory.reduce((a,b)=>a+b.totalLaba,0);
+        document.getElementById('allTimeOmset').innerText = formatRupiah(allOmset); document.getElementById('allTimeLaba').innerText = formatRupiah(allLaba); document.getElementById('allTimeTransCount').innerText = transactionHistory.length;
+        document.getElementById('historyModal').style.display='flex';
     }
-    function closeHistoryModal() { document.getElementById('historyModal').style.display = 'none'; }
+    function closeHistoryModal() { document.getElementById('historyModal').style.display='none'; }
+    function clearCart() { if(cart.length && confirm('Kosongkan keranjang?')) { cart=[]; renderAll(); saveToLocalStorage(); } }
+    function renderAll() { renderStockTable(); renderProductSelect(); renderCart(); updateFilteredStats(); filterProductSelect(); updateStorageDisplay(); }
+    function resetFilter() { document.getElementById('startDate').value=''; document.getElementById('endDate').value=''; updateFilteredStats(); showToast('Filter direset','success'); }
+    function updateDate() { document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+    function showToast(msg,type) { const t=document.createElement('div'); t.innerText=msg; t.style.position='fixed'; t.style.bottom='20px'; t.style.right='20px'; t.style.backgroundColor=type==='success'?'#10b981':'#ef4444'; t.style.color='white'; t.style.padding='12px 24px'; t.style.borderRadius='40px'; t.style.zIndex='9999'; t.style.fontWeight='bold'; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
 
-    function renderAll() { renderStockTable(); renderProductSelect(); renderCart(); updateStatsUI(); filterProductSelect(); }
-    function updateDate() { document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' }); }
-    function showToast(msg, type) {
-        const toast = document.createElement('div');
-        toast.innerText = msg;
-        toast.style.position = 'fixed'; toast.style.bottom = '20px'; toast.style.right = '20px';
-        toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
-        toast.style.color = 'white'; toast.style.padding = '12px 20px'; toast.style.borderRadius = '40px';
-        toast.style.zIndex = '9999'; toast.style.fontWeight = 'bold';
-        document.body.appendChild(toast);
-        setTimeout(()=>toast.remove(), 2500);
-    }
-
-    // Event listeners
+    // Event binding
     document.getElementById('addToCartBtn').addEventListener('click', addToCart);
     document.getElementById('checkoutBtn').addEventListener('click', checkout);
     document.getElementById('clearCartBtn').addEventListener('click', clearCart);
     document.getElementById('openAddProductModalBtn').addEventListener('click', openAddModal);
-    document.getElementById('closeModalBtn').addEventListener('click', closeProductModal);
+    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
     document.getElementById('saveProductBtn').addEventListener('click', saveProduct);
     document.getElementById('searchProductBtn').addEventListener('click', filterProductSelect);
-    document.getElementById('showInventoryModalBtn').addEventListener('click', showInventoryModal);
-    document.getElementById('closeInventoryBtn').addEventListener('click', closeInventoryModal);
-    // tambahan tombol history (optional)
-    const histBtn = document.createElement('button'); // tidak wajib, tapi kita beri akses cepat
-    if(document.getElementById('showHistoryModalBtn')) document.getElementById('showHistoryModalBtn')?.addEventListener('click', showHistoryModal);
-    document.getElementById('closeHistoryBtn')?.addEventListener('click', closeHistoryModal);
-    // untuk kemudahan, tambahkan tombol history di card laporan? sudah ada, tapi kita pasang event di tombol yang sudah ada? Di HTML tidak ada showHistoryModalBtn, kita buatkan via JS tambahan:
-    const extraBtn = document.createElement('button'); 
-    extraBtn.innerText = '📜 Riwayat Transaksi';
-    extraBtn.style.marginTop = '12px';
-    extraBtn.style.width = '100%';
-    extraBtn.style.background = '#f97316';
-    extraBtn.onclick = showHistoryModal;
-    document.querySelector('#showInventoryModalBtn')?.parentNode?.appendChild(extraBtn);
-    document.getElementById('closeHistoryBtn')?.addEventListener('click', closeHistoryModal);
-    window.onclick = function(e) { if(e.target === document.getElementById('productModal')) closeProductModal(); if(e.target === document.getElementById('inventoryModal')) closeInventoryModal(); if(e.target === document.getElementById('historyModal')) closeHistoryModal(); };
+    document.getElementById('showHistoryModalBtn').addEventListener('click', showHistoryModal);
+    document.getElementById('closeHistoryBtn').addEventListener('click', closeHistoryModal);
+    document.getElementById('applyFilterBtn').addEventListener('click', updateFilteredStats);
+    document.getElementById('resetFilterBtn').addEventListener('click', resetFilter);
+    document.getElementById('resetAllDataBtn').addEventListener('click', resetAllData);
+    window.onclick = e => { if(e.target===document.getElementById('productModal')) closeModal(); if(e.target===document.getElementById('historyModal')) closeHistoryModal(); };
+
+    // Inisialisasi
+    loadFromLocalStorage();
     updateDate();
     renderAll();
 </script>
