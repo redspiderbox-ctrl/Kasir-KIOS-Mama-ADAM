@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Kasir Pro+ </title>
+    <title>Kasir Pro+ | Pengaturan Struk (Edit Footer & Nama Toko)</title>
     <!-- SheetJS (XLSX) untuk export/import Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -66,6 +66,50 @@
             flex-wrap: wrap;
         }
         .total-stock-value { font-size: 2.2rem; font-weight: 800; background: rgba(255,255,255,0.2); padding: 8px 24px; border-radius: 60px; }
+
+        /* Setting Struk Card */
+        .setting-struk-card {
+            background: white;
+            border-radius: 28px;
+            padding: 20px 28px;
+            margin-bottom: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            justify-content: space-between;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+        }
+        .setting-group {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .setting-item label {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.8rem;
+        }
+        .setting-item input, .setting-item textarea {
+            padding: 10px 14px;
+            border-radius: 24px;
+            border: 1px solid #cbd5e1;
+            width: 220px;
+        }
+        .setting-item textarea {
+            width: 260px;
+            resize: vertical;
+        }
+        .btn-save-setting {
+            background: #10b981;
+            padding: 10px 24px;
+        }
 
         .excel-tools {
             background: white;
@@ -164,14 +208,16 @@
         .text-muted { color: #475569; font-size: 0.8rem; }
         .action-icons { display: flex; gap: 8px; margin-top: 12px; }
         .struk-print { font-family: 'Courier New', monospace; font-size: 12px; width: 280px; margin: 0 auto; padding: 16px; background: white; }
-        .struk-print h3 { text-align: center; font-size: 14px; }
+        .struk-print h3 { text-align: center; font-size: 14px; margin-bottom: 4px; }
+        .struk-print .shop-name { text-align: center; font-weight: bold; font-size: 13px; }
         .struk-print .divider { border-top: 1px dashed #000; margin: 8px 0; }
+        .struk-footer-custom { text-align: center; margin-top: 10px; font-size: 10px; white-space: pre-line; }
     </style>
 </head>
 <body>
 <div class="dashboard">
     <div class="header">
-        <h1>🏪 Kasir Kios Mama ADAM</h1>
+        <h1>🏪 Kasir Pro+ | Edit Struk (Nama Toko & Footer)</h1>
         <div class="date-box" id="currentDate"></div>
     </div>
 
@@ -187,6 +233,26 @@
     <div class="total-stock-card">
         <div>🏦 TOTAL NILAI SELURUH STOK (HARGA MODAL)</div>
         <div class="total-stock-value" id="totalStockValueDisplay">Rp 0</div>
+    </div>
+
+    <!-- PENGATURAN STRUK -->
+    <div class="setting-struk-card">
+        <div class="setting-group">
+            <div class="setting-item">
+                <label>🏪 Nama Toko / Header</label>
+                <input type="text" id="shopNameInput" placeholder="Contoh: TOKO MAJU JAYA" value="TOKO MAJU JAYA">
+            </div>
+            <div class="setting-item">
+                <label>📝 Footer / Catatan Kaki</label>
+                <textarea id="footerTextInput" rows="2" placeholder="Terima kasih telah berbelanja!&#10;Barang yang sudah dibeli tidak dapat dikembalikan.">Terima kasih telah berbelanja!
+Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
+            </div>
+            <div class="setting-item">
+                <label>📱 Nomor WA (opsional)</label>
+                <input type="text" id="whatsappNumberInput" placeholder="628123456789">
+            </div>
+        </div>
+        <button id="saveStrukSettingBtn" class="btn-save-setting">💾 Simpan Pengaturan Struk</button>
     </div>
 
     <div class="excel-tools">
@@ -260,8 +326,8 @@
 <!-- Modal Produk -->
 <div id="productModal" class="modal-overlay"><div class="modal-container"><h3 id="modalTitle">Tambah/Edit Barang</h3><input type="hidden" id="editId"><div><label>Kode</label><input id="modalCode"></div><div><label>Nama</label><input id="modalName"></div><div><label>Harga Jual</label><input id="modalPrice" type="number"></div><div><label>Harga Modal</label><input id="modalCost" type="number" value="0"></div><div><label>Stok</label><input id="modalStock" type="number"></div><div style="display:flex; gap:12px; justify-content:flex-end; margin-top:20px;"><button id="closeModalBtn" style="background:#94a3b8;">Batal</button><button id="saveProductBtn" style="background:#3b82f6;">Simpan</button></div></div></div>
 
-<!-- Modal Riwayat dengan tombol cetak ulang dan share ulang -->
-<div id="historyModal" class="modal-overlay"><div class="modal-container"><h3>📜 Riwayat Transaksi</h3><div id="historyList" style="max-height:400px; overflow:auto;"></div><div style="background:#f1f5f9; padding:16px; border-radius:28px; margin-top:12px;"><div class="flex-between"><strong>Total Omset:</strong> <span id="allTimeOmset">Rp 0</span></div><div class="flex-between"><strong>Total Laba:</strong> <span id="allTimeLaba">Rp 0</span></div><div class="flex-between"><strong>Jumlah Transaksi:</strong> <span id="allTimeTransCount">0</span></div></div><button id="closeHistoryBtn" class="close-modal-btn" style="margin-top:16px;">Tutup</button></div></div>
+<!-- Modal Riwayat -->
+<div id="historyModal" class="modal-overlay"><div class="modal-container"><h3>📜 Riwayat Transaksi</h3><div id="historyList" style="max-height:400px; overflow:auto;"></div><div style="background:#f1f5f9; padding:16px; border-radius:28px; margin-top:12px;"><div class="flex-between"><strong>Total Omset:</strong> <span id="allTimeOmset">Rp 0</span></div><div class="flex-between"><strong>Total Laba:</strong> <span id="allTimeLaba">Rp 0</span></div></div><button id="closeHistoryBtn" class="close-modal-btn" style="margin-top:16px;">Tutup</button></div></div>
 
 <script>
     // ======================== DATA GLOBAL ========================
@@ -269,10 +335,15 @@
     let transactionHistory = [];
     let cart = [];
     let stockFilterKeyword = "";
+    
+    // Pengaturan Struk
+    let shopName = "TOKO MAJU JAYA";
+    let footerText = "Terima kasih telah berbelanja!\nBarang yang sudah dibeli tidak dapat dikembalikan.";
+    let whatsappNumber = "";
 
     // ======================== STORAGE ========================
     function saveToLocalStorage() {
-        const data = { products, transactionHistory };
+        const data = { products, transactionHistory, shopName, footerText, whatsappNumber };
         localStorage.setItem('kasir_app_data', JSON.stringify(data));
         updateStorageDisplay();
         updateTotalStockValue();
@@ -285,6 +356,9 @@
                 const parsed = JSON.parse(saved);
                 products = parsed.products || [];
                 transactionHistory = parsed.transactionHistory || [];
+                shopName = parsed.shopName || "TOKO MAJU JAYA";
+                footerText = parsed.footerText || "Terima kasih telah berbelanja!\nBarang yang sudah dibeli tidak dapat dikembalikan.";
+                whatsappNumber = parsed.whatsappNumber || "";
                 if (products.length === 0) setDefaultProducts();
             } catch(e) { setDefaultProducts(); setSampleTransactions(); }
         } else {
@@ -292,6 +366,10 @@
             setSampleTransactions();
         }
         products.forEach(p => { if(p.cost === undefined) p.cost = 0; if(p.id === undefined) p.id = Date.now()+Math.random(); });
+        // update input fields
+        document.getElementById('shopNameInput').value = shopName;
+        document.getElementById('footerTextInput').value = footerText;
+        document.getElementById('whatsappNumberInput').value = whatsappNumber;
         saveToLocalStorage();
     }
 
@@ -314,9 +392,17 @@
         ];
     }
 
+    function saveStrukSettings() {
+        shopName = document.getElementById('shopNameInput').value.trim() || "TOKO KASIR";
+        footerText = document.getElementById('footerTextInput').value || "Terima kasih!";
+        whatsappNumber = document.getElementById('whatsappNumberInput').value.trim();
+        saveToLocalStorage();
+        showToast("Pengaturan struk berhasil disimpan!", "success");
+    }
+
     function updateStorageDisplay() {
         try {
-            const data = { products, transactionHistory };
+            const data = { products, transactionHistory, shopName, footerText, whatsappNumber };
             const sizeKB = (new Blob([JSON.stringify(data)]).size / 1024).toFixed(2);
             document.getElementById('usedMemory').innerText = `${sizeKB} KB`;
             document.getElementById('dataSize').innerText = `${sizeKB} KB`;
@@ -329,19 +415,19 @@
     function hitungTotalNilaiStok() { return products.reduce((a,b)=>a+((b.cost||0)*(b.stock||0)),0); }
     function updateTotalStockValue() { document.getElementById('totalStockValueDisplay').innerHTML = formatRupiah(hitungTotalNilaiStok()); }
 
-    // ======================== CETAK & SHARE ULANG (untuk transaksi dari riwayat) ========================
+    // ======================== CETAK STRUK DENGAN PENGATURAN ========================
     function generateStrukHTML(transaction) {
-        const itemsHtml = transaction.items.map(item => `<tr><td>${item.name} x${item.qty}</td><td align="right">${formatRupiah(item.price * item.qty)}</td></tr>`).join('');
+        const itemsHtml = transaction.items.map(item => `<tr><td style="padding:2px 0;">${item.name} x${item.qty}</td><td align="right">${formatRupiah(item.price * item.qty)}</td></tr>`).join('');
         return `
             <div class="struk-print">
-                <h3>📋 STRUK PEMBELIAN</h3>
-                <div style="text-align:center;">${transaction.dateDisplay || new Date().toLocaleString('id-ID')}</div>
+                <div class="shop-name">${shopName}</div>
+                <div style="text-align:center; font-size:10px;">${new Date().toLocaleString('id-ID')}</div>
                 <div class="divider"></div>
                 <table width="100%"><thead><tr><th>Item</th><th align="right">Total</th></tr></thead><tbody>${itemsHtml}</tbody></table>
                 <div class="divider"></div>
                 <div class="flex-between"><strong>TOTAL</strong><strong>${formatRupiah(transaction.totalOmset)}</strong></div>
                 <div class="divider"></div>
-                <div class="struk-footer">Terima kasih!</div>
+                <div class="struk-footer-custom">${footerText.replace(/\n/g, '<br>')}</div>
             </div>
         `;
     }
@@ -349,7 +435,7 @@
     function printStruk(transaction) {
         const strukHTML = generateStrukHTML(transaction);
         const printWindow = window.open('', '_blank', 'width=400,height=600');
-        printWindow.document.write(`<html><head><title>Struk Pembelian</title><style>body{font-family:'Courier New',monospace;margin:0;padding:16px;}.struk-print{width:280px;margin:0 auto;}.divider{border-top:1px dashed #000;margin:8px 0;}table{width:100%;}.flex-between{display:flex;justify-content:space-between;}</style></head><body>${strukHTML}</body></html>`);
+        printWindow.document.write(`<html><head><title>Struk ${shopName}</title><style>body{font-family:'Courier New',monospace;margin:0;padding:16px;}.struk-print{width:280px;margin:0 auto;}.divider{border-top:1px dashed #000;margin:8px 0;}table{width:100%;}.flex-between{display:flex;justify-content:space-between;}.shop-name{text-align:center;font-weight:bold;}.struk-footer-custom{text-align:center;margin-top:10px;font-size:10px;white-space:pre-line;}</style></head><body>${strukHTML}</body></html>`);
         printWindow.document.close();
         printWindow.print();
         printWindow.onafterprint = () => printWindow.close();
@@ -357,22 +443,27 @@
 
     function shareWhatsApp(transaction) {
         const text = generateWhatsAppText(transaction);
-        const phone = prompt("Masukkan nomor WhatsApp pelanggan (contoh: 628123456789) atau kosongkan untuk share ke diri sendiri:", "");
+        let phone = whatsappNumber;
+        if (!phone) {
+            phone = prompt("Masukkan nomor WhatsApp pelanggan (contoh: 628123456789) atau kosongkan:", "");
+        }
         let waUrl = `https://wa.me/${phone ? phone.replace(/[^0-9]/g, '') : ''}?text=${encodeURIComponent(text)}`;
         if (!phone) waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
         window.open(waUrl, '_blank');
     }
 
     function generateWhatsAppText(transaction) {
-        let text = `*📋 STRUK PEMBELIAN*\nTanggal: ${transaction.dateDisplay || new Date().toLocaleString('id-ID')}\n─────────────────\n`;
+        let text = `*${shopName}*\n`;
+        text += `Tanggal: ${new Date().toLocaleString('id-ID')}\n─────────────────\n`;
         transaction.items.forEach(item => { text += `${item.name} x${item.qty} = ${formatRupiah(item.price * item.qty)}\n`; });
-        text += `─────────────────\n*TOTAL: ${formatRupiah(transaction.totalOmset)}*\n─────────────────\nTerima kasih! 😊\n`;
+        text += `─────────────────\n*TOTAL: ${formatRupiah(transaction.totalOmset)}*\n─────────────────\n`;
+        text += footerText.replace(/\n/g, '\n');
         return text;
     }
 
     // ======================== RESET RIWAYAT ========================
     function resetHistoryOnly() {
-        if (confirm("⚠️ RESET RIWAYAT TRANSAKSI?\nStok barang TIDAK terpengaruh. Data tidak dapat dikembalikan.")) {
+        if (confirm("⚠️ RESET RIWAYAT TRANSAKSI?\nStok barang TIDAK terpengaruh.")) {
             transactionHistory = [];
             saveToLocalStorage();
             renderAll();
@@ -533,7 +624,6 @@
         saveToLocalStorage();
         renderAll();
         updateFilteredStats();
-        // Tampilkan modal aksi untuk struk baru
         showStrukActions(transaction);
         showToast(`Transaksi sukses! Total: ${formatRupiah(totalOmset)}`, "success");
     }
@@ -593,8 +683,7 @@
                 html += `<div class="history-item">
                             <div class="flex-between"><strong>📅 ${tr.dateDisplay}</strong><span>Omset: ${formatRupiah(tr.totalOmset)}</span></div>
                             <div>Laba: ${formatRupiah(tr.totalLaba)} | Margin: ${tr.totalOmset>0?((tr.totalLaba/tr.totalOmset)*100).toFixed(1):0}%</div>
-                            <hr>
-                            <div>${tr.items.map(i=>`${i.name} x${i.qty} = ${formatRupiah(i.subtotal)}`).join('<br>')}</div>
+                            <hr><div>${tr.items.map(i=>`${i.name} x${i.qty} = ${formatRupiah(i.subtotal)}`).join('<br>')}</div>
                             <div class="action-icons">
                                 <button class="btn-sm btn-print reprint-btn" data-idx="${idx}">🖨️ Cetak Ulang</button>
                                 <button class="btn-sm btn-wa reshare-btn" data-idx="${idx}">📱 Share Ulang</button>
@@ -602,25 +691,13 @@
                          </div>`;
             });
             histDiv.innerHTML = html;
-            // Event untuk tombol cetak ulang dan share ulang
-            document.querySelectorAll('.reprint-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const idx = parseInt(btn.dataset.idx);
-                    printStruk(transactionHistory[idx]);
-                });
-            });
-            document.querySelectorAll('.reshare-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const idx = parseInt(btn.dataset.idx);
-                    shareWhatsApp(transactionHistory[idx]);
-                });
-            });
+            document.querySelectorAll('.reprint-btn').forEach(btn => btn.addEventListener('click', (e) => { const idx = parseInt(btn.dataset.idx); printStruk(transactionHistory[idx]); }));
+            document.querySelectorAll('.reshare-btn').forEach(btn => btn.addEventListener('click', (e) => { const idx = parseInt(btn.dataset.idx); shareWhatsApp(transactionHistory[idx]); }));
         }
         let allOmset = transactionHistory.reduce((a,b)=>a+b.totalOmset,0);
         let allLaba = transactionHistory.reduce((a,b)=>a+b.totalLaba,0);
         document.getElementById('allTimeOmset').innerText = formatRupiah(allOmset);
         document.getElementById('allTimeLaba').innerText = formatRupiah(allLaba);
-        document.getElementById('allTimeTransCount').innerText = transactionHistory.length;
         document.getElementById('historyModal').style.display = 'flex';
     }
 
@@ -648,6 +725,7 @@
     function showToast(msg,type) { let t=document.createElement('div'); t.innerText=msg; t.style.position='fixed'; t.style.bottom='20px'; t.style.right='20px'; t.style.backgroundColor=type==='success'?'#10b981':'#ef4444'; t.style.color='white'; t.style.padding='12px 24px'; t.style.borderRadius='40px'; t.style.zIndex='9999'; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
 
     // Event binding
+    document.getElementById('saveStrukSettingBtn').addEventListener('click', saveStrukSettings);
     document.getElementById('downloadExcelBtn').addEventListener('click', downloadStockExcel);
     document.getElementById('uploadExcelInput').addEventListener('change', (e) => { if(e.target.files.length) importExcel(e.target.files[0]); e.target.value=''; });
     document.getElementById('addToCartBtn').addEventListener('click', addToCart);
