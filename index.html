@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Kasir Pro+ </title>
+    <title>Kasir Pro+ | Reset Riwayat Transaksi | Print Struk & Share WA</title>
     <!-- SheetJS (XLSX) untuk export/import Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -242,6 +242,7 @@
         .btn-primary { background: #3b82f6; }
         .btn-success { background: #10b981; }
         .btn-danger { background: #ef4444; }
+        .btn-warning { background: #f59e0b; }
         .btn-wa { background: #25D366; }
         .btn-print { background: #6c757d; }
         .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
@@ -308,34 +309,17 @@
             padding: 16px;
             background: white;
         }
-        .struk-print h3 {
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        .struk-print .divider {
-            border-top: 1px dashed #000;
-            margin: 8px 0;
-        }
-        .struk-print table {
-            width: 100%;
-            font-size: 11px;
-        }
-        .struk-print td {
-            padding: 2px 0;
-            border: none;
-        }
-        .struk-footer {
-            text-align: center;
-            margin-top: 12px;
-            font-size: 10px;
-        }
+        .struk-print h3 { text-align: center; font-size: 14px; margin-bottom: 8px; }
+        .struk-print .divider { border-top: 1px dashed #000; margin: 8px 0; }
+        .struk-print table { width: 100%; font-size: 11px; }
+        .struk-print td { padding: 2px 0; border: none; }
+        .struk-footer { text-align: center; margin-top: 12px; font-size: 10px; }
     </style>
 </head>
 <body>
 <div class="dashboard">
     <div class="header">
-        <h1>🏪 Kasir Kios Mama ADAM</h1>
+        <h1>🏪 Kasir Pro+ | Reset Riwayat Transaksi</h1>
         <div class="date-box" id="currentDate"></div>
     </div>
 
@@ -345,7 +329,7 @@
             <div class="storage-item"><span>📀 Sisa Memori:</span> <span id="remainingMemory">~5 MB</span></div>
             <div class="storage-item"><span>📦 Data Size:</span> <span id="dataSize">0 KB</span></div>
         </div>
-        <button id="resetAllDataBtn" class="btn-reset-storage">⚠️ Reset Semua Data</button>
+        <button id="resetAllDataBtn" class="btn-reset-storage">⚠️ Reset Semua Data (Stok+Transaksi)</button>
     </div>
 
     <!-- TOTAL NILAI STOK -->
@@ -369,9 +353,12 @@
             <div class="filter-item"><label>📅 Dari Tanggal</label><input type="date" id="startDate"></div>
             <div class="filter-item"><label>📅 Sampai Tanggal</label><input type="date" id="endDate"></div>
             <button id="applyFilterBtn" class="btn-primary">🔍 Tampilkan</button>
-            <button id="resetFilterBtn" class="btn-reset" style="background:#64748b;">⟳ Reset</button>
+            <button id="resetFilterBtn" class="btn-reset" style="background:#64748b;">⟳ Reset Filter</button>
         </div>
-        <button id="showHistoryModalBtn" style="background:#8b5cf6;">📋 Riwayat Transaksi</button>
+        <div style="display: flex; gap: 12px;">
+            <button id="showHistoryModalBtn" style="background:#8b5cf6;">📋 Lihat Riwayat</button>
+            <button id="resetHistoryOnlyBtn" style="background:#f59e0b; color:#1e293b;">🗑️ Reset Riwayat Transaksi</button>
+        </div>
     </div>
 
     <!-- Statistik Filter -->
@@ -411,14 +398,13 @@
 <div id="productModal" class="modal-overlay"><div class="modal-container"><h3 id="modalTitle">Tambah/Edit Barang</h3><input type="hidden" id="editId"><div><label>Kode</label><input id="modalCode"></div><div><label>Nama</label><input id="modalName"></div><div><label>Harga Jual</label><input id="modalPrice" type="number"></div><div><label>Harga Modal</label><input id="modalCost" type="number" value="0"></div><div><label>Stok</label><input id="modalStock" type="number"></div><div style="display:flex; gap:12px; justify-content:flex-end; margin-top:20px;"><button id="closeModalBtn" style="background:#94a3b8;">Batal</button><button id="saveProductBtn" style="background:#3b82f6;">Simpan</button></div></div></div>
 
 <!-- Modal Riwayat -->
-<div id="historyModal" class="modal-overlay"><div class="modal-container"><h3>📜 Semua Transaksi</h3><div id="historyList" style="max-height:400px; overflow:auto;"></div><div style="background:#f1f5f9; padding:16px; border-radius:28px; margin-top:12px;"><div class="flex-between"><strong>Total Omset:</strong> <span id="allTimeOmset">Rp 0</span></div><div class="flex-between"><strong>Total Laba:</strong> <span id="allTimeLaba">Rp 0</span></div></div><button id="closeHistoryBtn" class="close-modal-btn" style="margin-top:16px;">Tutup</button></div></div>
+<div id="historyModal" class="modal-overlay"><div class="modal-container"><h3>📜 Semua Transaksi</h3><div id="historyList" style="max-height:400px; overflow:auto;"></div><div style="background:#f1f5f9; padding:16px; border-radius:28px; margin-top:12px;"><div class="flex-between"><strong>Total Omset:</strong> <span id="allTimeOmset">Rp 0</span></div><div class="flex-between"><strong>Total Laba:</strong> <span id="allTimeLaba">Rp 0</span></div><div class="flex-between"><strong>Jumlah Transaksi:</strong> <span id="allTimeTransCount">0</span></div></div><button id="closeHistoryBtn" class="close-modal-btn" style="margin-top:16px;">Tutup</button></div></div>
 
 <script>
     // ======================== DATA GLOBAL ========================
     let products = [];
     let transactionHistory = [];
     let cart = [];
-    let lastTransactionData = null; // untuk menyimpan data transaksi terakhir (struk)
 
     // ======================== FUNGSI STORAGE ========================
     function saveToLocalStorage() {
@@ -436,7 +422,11 @@
                 products = parsed.products || [];
                 transactionHistory = parsed.transactionHistory || [];
                 if (products.length === 0) setDefaultProducts();
-                if (transactionHistory.length === 0) setSampleTransactions();
+                // JANGAN set sample transaksi jika sudah ada data, biar sesuai yang disimpan
+                if (transactionHistory.length === 0 && products.length > 0) {
+                    // hanya tambah sample jika benar2 kosong dan tidak ada data
+                    if (transactionHistory.length === 0) setSampleTransactions();
+                }
             } catch(e) { setDefaultProducts(); setSampleTransactions(); }
         } else {
             setDefaultProducts();
@@ -485,9 +475,18 @@
     }
     function updateTotalStockValue() { document.getElementById('totalStockValueDisplay').innerHTML = formatRupiah(hitungTotalNilaiStok()); }
 
-    // ======================== PRINT STRUK ========================
+    // ======================== RESET RIWAYAT TRANSAKSI (KHUSUS) ========================
+    function resetHistoryOnly() {
+        if (confirm("⚠️ RESET RIWAYAT TRANSAKSI\n\nTindakan ini akan MENGHAPUS SEMUA data transaksi (omset, laba, riwayat penjualan).\n\nStok barang TIDAK akan terpengaruh.\n\nData yang dihapus TIDAK dapat dikembalikan.\n\nLanjutkan?")) {
+            transactionHistory = [];
+            saveToLocalStorage();
+            renderAll();
+            showToast("✅ Riwayat transaksi berhasil direset! Memori lebih hemat.", "success");
+        }
+    }
+
+    // ======================== PRINT & SHARE STRUK ========================
     function generateStrukHTML(transaction) {
-        const tanggal = new Date().toLocaleString('id-ID');
         const itemsHtml = transaction.items.map(item => `
             <tr>
                 <td>${item.name} x${item.qty}</td>
@@ -537,10 +536,10 @@
     }
 
     function shareWhatsApp(transaction) {
-        const strukText = generateWhatsAppText(transaction);
+        const text = generateWhatsAppText(transaction);
         const phone = prompt("Masukkan nomor WhatsApp pelanggan (contoh: 628123456789) atau kosongkan untuk share ke diri sendiri:", "");
-        let waUrl = `https://wa.me/${phone ? phone.replace(/[^0-9]/g, '') : ''}?text=${encodeURIComponent(strukText)}`;
-        if (!phone) waUrl = `https://wa.me/?text=${encodeURIComponent(strukText)}`;
+        let waUrl = `https://wa.me/${phone ? phone.replace(/[^0-9]/g, '') : ''}?text=${encodeURIComponent(text)}`;
+        if (!phone) waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
         window.open(waUrl, '_blank');
     }
 
@@ -769,15 +768,16 @@
     function closeModal() { document.getElementById('productModal').style.display='none'; }
     function showHistoryModal() {
         let histDiv = document.getElementById('historyList');
-        if(!transactionHistory.length) histDiv.innerHTML = '<div style="padding:20px;">Belum ada transaksi</div>';
+        if(!transactionHistory.length) histDiv.innerHTML = '<div style="padding:20px; text-align:center;">📭 Belum ada transaksi. Lakukan pembayaran terlebih dahulu.</div>';
         else { let html=''; transactionHistory.forEach(tr => { html+=`<div class="history-item"><div class="flex-between"><strong>📅 ${tr.dateDisplay}</strong><span>Omset: ${formatRupiah(tr.totalOmset)}</span></div><div>Laba: ${formatRupiah(tr.totalLaba)} | Margin: ${tr.totalOmset>0?((tr.totalLaba/tr.totalOmset)*100).toFixed(1):0}%</div><hr><div>${tr.items.map(i=>`${i.name} x${i.qty} = ${formatRupiah(i.subtotal)} (laba: ${formatRupiah(i.laba)})`).join('<br>')}</div></div>`; }); histDiv.innerHTML = html; }
         let allOmset = transactionHistory.reduce((a,b)=>a+b.totalOmset,0), allLaba = transactionHistory.reduce((a,b)=>a+b.totalLaba,0);
         document.getElementById('allTimeOmset').innerText = formatRupiah(allOmset); document.getElementById('allTimeLaba').innerText = formatRupiah(allLaba);
+        document.getElementById('allTimeTransCount').innerText = transactionHistory.length;
         document.getElementById('historyModal').style.display='flex';
     }
     function closeHistoryModal() { document.getElementById('historyModal').style.display='none'; }
     function clearCart() { if(cart.length && confirm("Kosongkan keranjang?")) { cart=[]; renderAll(); saveToLocalStorage(); } }
-    function resetAllData() { if(confirm("Hapus SEMUA data?")) { localStorage.removeItem('kasir_app_data'); setDefaultProducts(); setSampleTransactions(); cart=[]; saveToLocalStorage(); renderAll(); showToast("Data direset ke default","success"); } }
+    function resetAllData() { if(confirm("⚠️ RESET SEMUA DATA\n\nAkan menghapus SEMUA produk, stok, DAN riwayat transaksi. Data tidak dapat dikembalikan.\n\nLanjutkan?")) { localStorage.removeItem('kasir_app_data'); setDefaultProducts(); setSampleTransactions(); cart=[]; saveToLocalStorage(); renderAll(); showToast("Semua data direset ke default","success"); } }
     function renderAll() { renderStockTable(); renderProductSelect(); renderCart(); updateFilteredStats(); filterProductSelect(); updateStorageDisplay(); updateTotalStockValue(); }
     function resetFilter() { document.getElementById('startDate').value=''; document.getElementById('endDate').value=''; updateFilteredStats(); showToast("Filter direset","success"); }
     function updateDate() { document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
@@ -798,6 +798,7 @@
     document.getElementById('applyFilterBtn').addEventListener('click', updateFilteredStats);
     document.getElementById('resetFilterBtn').addEventListener('click', resetFilter);
     document.getElementById('resetAllDataBtn').addEventListener('click', resetAllData);
+    document.getElementById('resetHistoryOnlyBtn').addEventListener('click', resetHistoryOnly);
     window.onclick = e => { if(e.target===document.getElementById('productModal')) closeModal(); if(e.target===document.getElementById('historyModal')) closeHistoryModal(); };
     
     updateDate();
