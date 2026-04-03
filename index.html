@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Kasir Pro+</title>
+    <title>Kasir Pro+ | Pencarian Stok Barang | Reset Riwayat | Print & WA</title>
     <!-- SheetJS (XLSX) untuk export/import Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -139,7 +139,7 @@
         }
         .file-label input { display: none; }
 
-        /* Filter */
+        /* Filter Tanggal */
         .filter-section {
             background: white;
             border-radius: 28px;
@@ -218,6 +218,24 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
+        }
+        .card-header .search-stock-box {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .card-header .search-stock-box input {
+            padding: 8px 14px;
+            border-radius: 40px;
+            border: 1px solid #cbd5e1;
+            width: 200px;
+            font-size: 0.85rem;
+        }
+        .card-header .search-stock-box button {
+            padding: 8px 16px;
+            background: #3b82f6;
         }
         .card-body {
             padding: 20px 24px;
@@ -319,7 +337,7 @@
 <body>
 <div class="dashboard">
     <div class="header">
-        <h1>🏪 Kasir Kios Mama ADAM</h1>
+        <h1>🏪 Kasir Pro+ | Cari Stok Barang</h1>
         <div class="date-box" id="currentDate"></div>
     </div>
 
@@ -388,8 +406,26 @@
             </div></div>
         </div>
         <div class="col">
-            <div class="card"><div class="card-header">📦 Stok Barang <button id="openAddProductModalBtn" style="margin-left:auto; background:#10b981;" class="btn-sm">+ Barang</button></div>
-            <div class="card-body"><div style="overflow-x:auto;"><table><thead><tr><th>Kode</th><th>Nama</th><th>Harga Jual</th><th>Modal</th><th>Stok</th><th>Nilai Stok</th><th>Aksi</th></thead><tbody id="stockTableBody"></tbody></table></div></div></div>
+            <div class="card">
+                <div class="card-header">
+                    📦 Stok Barang
+                    <div class="search-stock-box">
+                        <input type="text" id="stockSearchInput" placeholder="Cari kode/nama...">
+                        <button id="stockSearchBtn" class="btn-sm">🔍 Cari</button>
+                        <button id="stockResetBtn" class="btn-sm" style="background:#64748b;">↺ Reset</button>
+                    </div>
+                    <button id="openAddProductModalBtn" style="margin-left:8px; background:#10b981;" class="btn-sm">+ Barang</button>
+                </div>
+                <div class="card-body">
+                    <div style="overflow-x:auto;">
+                        <table id="stockTable">
+                            <thead><tr><th>Kode</th><th>Nama</th><th>Harga Jual</th><th>Modal</th><th>Stok</th><th>Nilai Stok</th><th>Aksi</th></thead>
+                            <tbody id="stockTableBody"></tbody>
+                        </table>
+                    </div>
+                    <div id="stockSearchInfo" style="font-size:0.75rem; color:#64748b; margin-top:8px;"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -405,6 +441,7 @@
     let products = [];
     let transactionHistory = [];
     let cart = [];
+    let stockFilterKeyword = ""; // untuk pencarian stok
 
     // ======================== FUNGSI STORAGE ========================
     function saveToLocalStorage() {
@@ -422,9 +459,7 @@
                 products = parsed.products || [];
                 transactionHistory = parsed.transactionHistory || [];
                 if (products.length === 0) setDefaultProducts();
-                // JANGAN set sample transaksi jika sudah ada data, biar sesuai yang disimpan
                 if (transactionHistory.length === 0 && products.length > 0) {
-                    // hanya tambah sample jika benar2 kosong dan tidak ada data
                     if (transactionHistory.length === 0) setSampleTransactions();
                 }
             } catch(e) { setDefaultProducts(); setSampleTransactions(); }
@@ -475,13 +510,37 @@
     }
     function updateTotalStockValue() { document.getElementById('totalStockValueDisplay').innerHTML = formatRupiah(hitungTotalNilaiStok()); }
 
-    // ======================== RESET RIWAYAT TRANSAKSI (KHUSUS) ========================
+    // ======================== RESET RIWAYAT TRANSAKSI ========================
     function resetHistoryOnly() {
         if (confirm("⚠️ RESET RIWAYAT TRANSAKSI\n\nTindakan ini akan MENGHAPUS SEMUA data transaksi (omset, laba, riwayat penjualan).\n\nStok barang TIDAK akan terpengaruh.\n\nData yang dihapus TIDAK dapat dikembalikan.\n\nLanjutkan?")) {
             transactionHistory = [];
             saveToLocalStorage();
             renderAll();
             showToast("✅ Riwayat transaksi berhasil direset! Memori lebih hemat.", "success");
+        }
+    }
+
+    // ======================== PENCARIAN STOK KHUSUS ========================
+    function filterStockTable() {
+        const keyword = stockFilterKeyword.toLowerCase().trim();
+        const tbody = document.getElementById('stockTableBody');
+        const allRows = tbody.querySelectorAll('tr.data-row');
+        let visibleCount = 0;
+        allRows.forEach(row => {
+            const kode = row.getAttribute('data-code') || "";
+            const nama = row.getAttribute('data-name') || "";
+            if (keyword === "" || kode.includes(keyword) || nama.includes(keyword)) {
+                row.style.display = "";
+                visibleCount++;
+            } else {
+                row.style.display = "none";
+            }
+        });
+        const infoDiv = document.getElementById('stockSearchInfo');
+        if (keyword !== "") {
+            infoDiv.innerHTML = `🔍 Menampilkan ${visibleCount} dari ${allRows.length} barang (pencarian: "${keyword}")`;
+        } else {
+            infoDiv.innerHTML = "";
         }
     }
 
@@ -647,10 +706,13 @@
 
     function renderStockTable() {
         const tbody = document.getElementById('stockTableBody');
-        if (!products.length) { tbody.innerHTML = '<tr><td colspan="7">Tidak ada数据</td></tr>'; return; }
+        if (!products.length) { tbody.innerHTML = '<tr><td colspan="7">Tidak ada data</td></tr>'; return; }
         tbody.innerHTML = '';
         products.forEach(prod => {
             const row = tbody.insertRow();
+            row.className = 'data-row';
+            row.setAttribute('data-code', prod.code.toLowerCase());
+            row.setAttribute('data-name', prod.name.toLowerCase());
             row.insertCell(0).innerText = prod.code;
             row.insertCell(1).innerText = prod.name;
             row.insertCell(2).innerText = formatRupiah(prod.price);
@@ -666,6 +728,7 @@
         document.querySelectorAll('.delete-product').forEach(btn => btn.addEventListener('click', (e) => {
             if(confirm('Hapus barang?')) { products = products.filter(p => p.id !== btn.dataset.id); cart = cart.filter(c => c.productId !== btn.dataset.id); saveToLocalStorage(); renderAll(); showToast('Barang dihapus','danger'); }
         }));
+        filterStockTable(); // terapkan filter setelah render
     }
 
     function renderProductSelect() {
@@ -783,7 +846,24 @@
     function updateDate() { document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
     function showToast(msg,type) { let t=document.createElement('div'); t.innerText=msg; t.style.position='fixed'; t.style.bottom='20px'; t.style.right='20px'; t.style.backgroundColor=type==='success'?'#10b981':'#ef4444'; t.style.color='white'; t.style.padding='12px 24px'; t.style.borderRadius='40px'; t.style.zIndex='9999'; t.style.fontWeight='bold'; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
 
-    // Event binding
+    // Event binding untuk pencarian stok
+    document.getElementById('stockSearchBtn').addEventListener('click', () => {
+        stockFilterKeyword = document.getElementById('stockSearchInput').value;
+        filterStockTable();
+    });
+    document.getElementById('stockResetBtn').addEventListener('click', () => {
+        document.getElementById('stockSearchInput').value = '';
+        stockFilterKeyword = '';
+        filterStockTable();
+    });
+    document.getElementById('stockSearchInput').addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            stockFilterKeyword = document.getElementById('stockSearchInput').value;
+            filterStockTable();
+        }
+    });
+
+    // Event binding lainnya
     document.getElementById('downloadExcelBtn').addEventListener('click', downloadStockExcel);
     document.getElementById('uploadExcelInput').addEventListener('change', (e) => { if(e.target.files.length) importExcel(e.target.files[0]); e.target.value=''; });
     document.getElementById('addToCartBtn').addEventListener('click', addToCart);
