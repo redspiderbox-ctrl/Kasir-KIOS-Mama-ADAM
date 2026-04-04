@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Kasir Pro+ </title>
+    <title>Kasir Pro+ | Print via Bluetooth | Struk Thermal 58mm</title>
     <!-- SheetJS (XLSX) untuk export/import Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -102,13 +102,13 @@
             border: 1px solid #cbd5e1;
             width: 220px;
         }
-        .setting-item textarea {
-            width: 260px;
-            resize: vertical;
-        }
-        .btn-save-setting {
-            background: #10b981;
-            padding: 10px 24px;
+        .setting-item textarea { width: 260px; resize: vertical; }
+        .btn-save-setting { background: #10b981; padding: 10px 24px; }
+        .btn-bluetooth { background: #3b82f6; padding: 10px 24px; display: inline-flex; align-items: center; gap: 8px; }
+        .bluetooth-status {
+            font-size: 0.75rem;
+            margin-top: 4px;
+            color: #475569;
         }
 
         .excel-tools {
@@ -206,18 +206,32 @@
         .history-item { background: #f8fafc; border-radius: 28px; padding: 16px; margin-bottom: 16px; border-left: 6px solid #3b82f6; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
         .text-muted { color: #475569; font-size: 0.8rem; }
-        .action-icons { display: flex; gap: 8px; margin-top: 12px; }
-        .struk-print { font-family: 'Courier New', monospace; font-size: 12px; width: 280px; margin: 0 auto; padding: 16px; background: white; }
-        .struk-print h3 { text-align: center; font-size: 14px; margin-bottom: 4px; }
-        .struk-print .shop-name { text-align: center; font-weight: bold; font-size: 13px; }
-        .struk-print .divider { border-top: 1px dashed #000; margin: 8px 0; }
-        .struk-footer-custom { text-align: center; margin-top: 10px; font-size: 10px; white-space: pre-line; }
+        .action-icons { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+        /* STRUK THERMAL 58mm */
+        .struk-print {
+            font-family: 'Courier New', 'Courier', monospace;
+            font-size: 11px;
+            width: 58mm;
+            max-width: 58mm;
+            margin: 0 auto;
+            padding: 4px 2px;
+            background: white;
+        }
+        .struk-print .shop-name { text-align: center; font-weight: bold; font-size: 13px; margin-bottom: 4px; }
+        .struk-print .divider { border-top: 1px dashed #000; margin: 6px 0; }
+        .struk-print .divider-dotted { border-top: 1px dotted #000; margin: 4px 0; }
+        .struk-print table { width: 100%; font-size: 10px; }
+        .struk-print td { padding: 2px 0; border: none; }
+        .struk-print .item-name { text-align: left; }
+        .struk-print .item-price { text-align: right; white-space: nowrap; }
+        .struk-footer-custom { text-align: center; margin-top: 8px; font-size: 9px; white-space: pre-line; }
     </style>
 </head>
 <body>
 <div class="dashboard">
     <div class="header">
-        <h1>🏪 Kasir Kios Mama ADAM</h1>
+        <h1>🏪 Kasir Pro+ | Print Bluetooth | Thermal 58mm</h1>
         <div class="date-box" id="currentDate"></div>
     </div>
 
@@ -235,24 +249,27 @@
         <div class="total-stock-value" id="totalStockValueDisplay">Rp 0</div>
     </div>
 
-    <!-- PENGATURAN STRUK -->
+    <!-- PENGATURAN STRUK & BLUETOOTH -->
     <div class="setting-struk-card">
         <div class="setting-group">
             <div class="setting-item">
-                <label>🏪 Nama Toko / Header</label>
-                <input type="text" id="shopNameInput" placeholder="Contoh: TOKO MAJU JAYA" value="TOKO MAJU JAYA">
+                <label>🏪 Nama Toko</label>
+                <input type="text" id="shopNameInput" placeholder="Nama Toko" value="TOKO MAJU JAYA">
             </div>
             <div class="setting-item">
-                <label>📝 Footer / Catatan Kaki</label>
-                <textarea id="footerTextInput" rows="2" placeholder="Terima kasih telah berbelanja!&#10;Barang yang sudah dibeli tidak dapat dikembalikan.">Terima kasih telah berbelanja!
-Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
+                <label>📝 Footer / Catatan</label>
+                <textarea id="footerTextInput" rows="2" placeholder="Catatan kaki">Terima kasih telah berbelanja!</textarea>
             </div>
             <div class="setting-item">
-                <label>📱 Nomor WA (opsional)</label>
+                <label>📱 No. WA (opsional)</label>
                 <input type="text" id="whatsappNumberInput" placeholder="628123456789">
             </div>
         </div>
-        <button id="saveStrukSettingBtn" class="btn-save-setting">💾 Simpan Pengaturan Struk</button>
+        <div>
+            <button id="connectBluetoothBtn" class="btn-bluetooth">🔷 Connect Bluetooth Printer</button>
+            <div id="bluetoothStatus" class="bluetooth-status">Belum terhubung</div>
+        </div>
+        <button id="saveStrukSettingBtn" class="btn-save-setting">💾 Simpan Pengaturan</button>
     </div>
 
     <div class="excel-tools">
@@ -294,7 +311,10 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
                 <div id="cartList"><div class="empty-cart">Keranjang kosong</div></div>
                 <div id="cartSummary" style="display:none;">
                     <div class="cart-total"><div class="flex-between"><span>Total:</span><span class="grand-total" id="cartTotalAmount">Rp 0</span></div></div>
-                    <div style="display:flex; gap:12px; margin-top:18px;"><button id="checkoutBtn" class="btn-success">✅ Bayar</button><button id="clearCartBtn" class="btn-danger">🗑️ Kosongkan</button></div>
+                    <div style="display:flex; gap:12px; margin-top:18px; flex-wrap:wrap;">
+                        <button id="checkoutBtn" class="btn-success">✅ Bayar</button>
+                        <button id="clearCartBtn" class="btn-danger">🗑️ Kosongkan</button>
+                    </div>
                 </div>
             </div></div>
         </div>
@@ -338,8 +358,13 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
     
     // Pengaturan Struk
     let shopName = "TOKO MAJU JAYA";
-    let footerText = "Terima kasih telah berbelanja!\nBarang yang sudah dibeli tidak dapat dikembalikan.";
+    let footerText = "Terima kasih telah berbelanja!";
     let whatsappNumber = "";
+
+    // Bluetooth Printer
+    let bluetoothDevice = null;
+    let bluetoothCharacteristic = null;
+    let isBluetoothConnected = false;
 
     // ======================== STORAGE ========================
     function saveToLocalStorage() {
@@ -357,7 +382,7 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
                 products = parsed.products || [];
                 transactionHistory = parsed.transactionHistory || [];
                 shopName = parsed.shopName || "TOKO MAJU JAYA";
-                footerText = parsed.footerText || "Terima kasih telah berbelanja!\nBarang yang sudah dibeli tidak dapat dikembalikan.";
+                footerText = parsed.footerText || "Terima kasih telah berbelanja!";
                 whatsappNumber = parsed.whatsappNumber || "";
                 if (products.length === 0) setDefaultProducts();
             } catch(e) { setDefaultProducts(); setSampleTransactions(); }
@@ -366,7 +391,6 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
             setSampleTransactions();
         }
         products.forEach(p => { if(p.cost === undefined) p.cost = 0; if(p.id === undefined) p.id = Date.now()+Math.random(); });
-        // update input fields
         document.getElementById('shopNameInput').value = shopName;
         document.getElementById('footerTextInput').value = footerText;
         document.getElementById('whatsappNumberInput').value = whatsappNumber;
@@ -397,7 +421,7 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
         footerText = document.getElementById('footerTextInput').value || "Terima kasih!";
         whatsappNumber = document.getElementById('whatsappNumberInput').value.trim();
         saveToLocalStorage();
-        showToast("Pengaturan struk berhasil disimpan!", "success");
+        showToast("Pengaturan struk disimpan!", "success");
     }
 
     function updateStorageDisplay() {
@@ -415,27 +439,126 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
     function hitungTotalNilaiStok() { return products.reduce((a,b)=>a+((b.cost||0)*(b.stock||0)),0); }
     function updateTotalStockValue() { document.getElementById('totalStockValueDisplay').innerHTML = formatRupiah(hitungTotalNilaiStok()); }
 
-    // ======================== CETAK STRUK DENGAN PENGATURAN ========================
+    // ======================== BLUETOOTH PRINT ========================
+    async function connectBluetooth() {
+        if (!navigator.bluetooth) {
+            alert("Browser Anda tidak mendukung Web Bluetooth. Gunakan Chrome atau Edge.");
+            return;
+        }
+        try {
+            const device = await navigator.bluetooth.requestDevice({
+                filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }], // Service printer umum
+                optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+            });
+            bluetoothDevice = device;
+            const server = await device.gatt.connect();
+            const service = await server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+            const characteristic = await service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+            bluetoothCharacteristic = characteristic;
+            isBluetoothConnected = true;
+            document.getElementById('bluetoothStatus').innerHTML = '✅ Terhubung ke ' + (device.name || 'Printer Bluetooth');
+            showToast("Bluetooth printer terhubung!", "success");
+            device.addEventListener('gattserverdisconnected', onDisconnected);
+        } catch (error) {
+            console.error(error);
+            showToast("Gagal konek Bluetooth: " + error.message, "danger");
+            isBluetoothConnected = false;
+            document.getElementById('bluetoothStatus').innerHTML = '❌ Gagal terhubung';
+        }
+    }
+
+    function onDisconnected() {
+        isBluetoothConnected = false;
+        bluetoothCharacteristic = null;
+        document.getElementById('bluetoothStatus').innerHTML = '⚠️ Terputus, klik connect lagi';
+        showToast("Printer Bluetooth terputus", "danger");
+    }
+
+    async function printViaBluetooth(transaction) {
+        if (!isBluetoothConnected || !bluetoothCharacteristic) {
+            showToast("Printer Bluetooth belum terhubung. Klik 'Connect Bluetooth Printer' terlebih dahulu.", "danger");
+            return false;
+        }
+        try {
+            const text = generateStrukText(transaction);
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text + "\n\n\n\n\n");
+            await bluetoothCharacteristic.writeValue(data);
+            showToast("Struk berhasil dikirim ke printer Bluetooth!", "success");
+            return true;
+        } catch (error) {
+            showToast("Gagal print via Bluetooth: " + error.message, "danger");
+            return false;
+        }
+    }
+
+    function generateStrukText(transaction) {
+        const dateStr = new Date().toLocaleString('id-ID', { hour12: false });
+        let text = "";
+        text += "=".repeat(32) + "\n";
+        text += `      ${shopName}\n`;
+        text += "=".repeat(32) + "\n";
+        text += `${dateStr}\n`;
+        text += "-".repeat(32) + "\n";
+        for (let item of transaction.items) {
+            const itemName = item.name.length > 20 ? item.name.substring(0,18)+".." : item.name;
+            const qtyStr = `x${item.qty}`;
+            const priceStr = formatRupiah(item.price * item.qty);
+            const line = `${itemName} ${qtyStr}`;
+            const spaces = 28 - line.length - priceStr.length;
+            text += line + " ".repeat(Math.max(1, spaces)) + priceStr + "\n";
+        }
+        text += "-".repeat(32) + "\n";
+        text += `TOTAL${" ".repeat(20)}${formatRupiah(transaction.totalOmset)}\n`;
+        text += "-".repeat(32) + "\n";
+        text += `${footerText}\n`;
+        if (whatsappNumber) text += `WA: ${whatsappNumber}\n`;
+        text += "=".repeat(32) + "\n";
+        text += "Terima kasih!\n\n";
+        return text;
+    }
+
+    // ======================== CETAK STRUK (WEB PRINT) ========================
     function generateStrukHTML(transaction) {
-        const itemsHtml = transaction.items.map(item => `<tr><td style="padding:2px 0;">${item.name} x${item.qty}</td><td align="right">${formatRupiah(item.price * item.qty)}</td></tr>`).join('');
+        const itemsHtml = transaction.items.map(item => {
+            const itemName = item.name.length > 24 ? item.name.substring(0,22)+".." : item.name;
+            return `<tr><td class="item-name">${itemName} x${item.qty}</td><td class="item-price">${formatRupiah(item.price * item.qty)}</td></tr>`;
+        }).join('');
+        const dateStr = new Date().toLocaleString('id-ID', { hour12: false });
         return `
             <div class="struk-print">
                 <div class="shop-name">${shopName}</div>
-                <div style="text-align:center; font-size:10px;">${new Date().toLocaleString('id-ID')}</div>
+                <div style="text-align:center; font-size:9px;">${dateStr}</div>
                 <div class="divider"></div>
-                <table width="100%"><thead><tr><th>Item</th><th align="right">Total</th></tr></thead><tbody>${itemsHtml}</tbody></table>
-                <div class="divider"></div>
-                <div class="flex-between"><strong>TOTAL</strong><strong>${formatRupiah(transaction.totalOmset)}</strong></div>
+                <table><tbody>${itemsHtml}</tbody></table>
+                <div class="divider-dotted"></div>
+                <div class="flex-between" style="font-weight:bold;"><span>TOTAL</span><span>${formatRupiah(transaction.totalOmset)}</span></div>
                 <div class="divider"></div>
                 <div class="struk-footer-custom">${footerText.replace(/\n/g, '<br>')}</div>
+                ${whatsappNumber ? `<div style="text-align:center; font-size:8px; margin-top:6px;">WA: ${whatsappNumber}</div>` : ''}
             </div>
         `;
     }
 
-    function printStruk(transaction) {
+    function printWeb(transaction) {
         const strukHTML = generateStrukHTML(transaction);
         const printWindow = window.open('', '_blank', 'width=400,height=600');
-        printWindow.document.write(`<html><head><title>Struk ${shopName}</title><style>body{font-family:'Courier New',monospace;margin:0;padding:16px;}.struk-print{width:280px;margin:0 auto;}.divider{border-top:1px dashed #000;margin:8px 0;}table{width:100%;}.flex-between{display:flex;justify-content:space-between;}.shop-name{text-align:center;font-weight:bold;}.struk-footer-custom{text-align:center;margin-top:10px;font-size:10px;white-space:pre-line;}</style></head><body>${strukHTML}</body></html>`);
+        printWindow.document.write(`
+            <html><head><title>Struk ${shopName}</title>
+            <style>
+                *{margin:0;padding:0;box-sizing:border-box;}
+                body{font-family:'Courier New',monospace;background:white;display:flex;justify-content:center;padding:8px 0;}
+                .struk-print{width:58mm;max-width:58mm;margin:0 auto;padding:4px 2px;font-size:11px;}
+                .shop-name{text-align:center;font-weight:bold;font-size:13px;margin-bottom:4px;}
+                .divider{border-top:1px dashed #000;margin:6px 0;}
+                .divider-dotted{border-top:1px dotted #000;margin:4px 0;}
+                table{width:100%;font-size:10px;} td{padding:2px 0;border:none;}
+                .item-name{text-align:left;} .item-price{text-align:right;white-space:nowrap;}
+                .flex-between{display:flex;justify-content:space-between;}
+                .struk-footer-custom{text-align:center;margin-top:8px;font-size:9px;white-space:pre-line;}
+                @media print{@page{margin:0;size:58mm auto;}body{margin:0;padding:0;}}
+            </style></head><body>${strukHTML}</body></html>
+        `);
         printWindow.document.close();
         printWindow.print();
         printWindow.onafterprint = () => printWindow.close();
@@ -444,20 +567,16 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
     function shareWhatsApp(transaction) {
         const text = generateWhatsAppText(transaction);
         let phone = whatsappNumber;
-        if (!phone) {
-            phone = prompt("Masukkan nomor WhatsApp pelanggan (contoh: 628123456789) atau kosongkan:", "");
-        }
+        if (!phone) phone = prompt("Masukkan nomor WhatsApp pelanggan:", "");
         let waUrl = `https://wa.me/${phone ? phone.replace(/[^0-9]/g, '') : ''}?text=${encodeURIComponent(text)}`;
-        if (!phone) waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
         window.open(waUrl, '_blank');
     }
 
     function generateWhatsAppText(transaction) {
-        let text = `*${shopName}*\n`;
-        text += `Tanggal: ${new Date().toLocaleString('id-ID')}\n─────────────────\n`;
+        let text = `*${shopName}*\n${new Date().toLocaleString('id-ID')}\n─────────────────\n`;
         transaction.items.forEach(item => { text += `${item.name} x${item.qty} = ${formatRupiah(item.price * item.qty)}\n`; });
-        text += `─────────────────\n*TOTAL: ${formatRupiah(transaction.totalOmset)}*\n─────────────────\n`;
-        text += footerText.replace(/\n/g, '\n');
+        text += `─────────────────\n*TOTAL: ${formatRupiah(transaction.totalOmset)}*\n─────────────────\n${footerText}`;
+        if (whatsappNumber) text += `\nWA: ${whatsappNumber}`;
         return text;
     }
 
@@ -633,21 +752,23 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
         modal.className = 'modal-overlay';
         modal.style.display = 'flex';
         modal.innerHTML = `
-            <div class="modal-container" style="max-width:400px; text-align:center;">
+            <div class="modal-container" style="max-width:450px; text-align:center;">
                 <h3>🧾 Transaksi Berhasil</h3>
                 <div style="background:#f0fdf4; padding:16px; border-radius:28px; margin:16px 0;">
                     <div style="font-size:1.2rem; font-weight:bold;">${formatRupiah(transaction.totalOmset)}</div>
                 </div>
-                <div style="display:flex; gap:12px; justify-content:center;">
-                    <button id="printNowBtn" class="btn-print">🖨️ Print Struk</button>
-                    <button id="waNowBtn" class="btn-wa">📱 Share WhatsApp</button>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+                    <button id="printWebBtn" class="btn-print">🖨️ Print Web</button>
+                    <button id="printBluetoothBtn" class="btn-bluetooth">🔷 Print Bluetooth</button>
+                    <button id="waBtn" class="btn-wa">📱 Share WA</button>
                     <button id="closeActionModal" class="btn-primary" style="background:#64748b;">Tutup</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
-        document.getElementById('printNowBtn').onclick = () => { printStruk(transaction); modal.remove(); };
-        document.getElementById('waNowBtn').onclick = () => { shareWhatsApp(transaction); modal.remove(); };
+        document.getElementById('printWebBtn').onclick = () => { printWeb(transaction); modal.remove(); };
+        document.getElementById('printBluetoothBtn').onclick = async () => { await printViaBluetooth(transaction); modal.remove(); };
+        document.getElementById('waBtn').onclick = () => { shareWhatsApp(transaction); modal.remove(); };
         document.getElementById('closeActionModal').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
@@ -685,13 +806,15 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
                             <div>Laba: ${formatRupiah(tr.totalLaba)} | Margin: ${tr.totalOmset>0?((tr.totalLaba/tr.totalOmset)*100).toFixed(1):0}%</div>
                             <hr><div>${tr.items.map(i=>`${i.name} x${i.qty} = ${formatRupiah(i.subtotal)}`).join('<br>')}</div>
                             <div class="action-icons">
-                                <button class="btn-sm btn-print reprint-btn" data-idx="${idx}">🖨️ Cetak Ulang</button>
-                                <button class="btn-sm btn-wa reshare-btn" data-idx="${idx}">📱 Share Ulang</button>
+                                <button class="btn-sm btn-print reprint-web-btn" data-idx="${idx}">🖨️ Print Web</button>
+                                <button class="btn-sm btn-bluetooth reprint-bt-btn" data-idx="${idx}">🔷 Print BT</button>
+                                <button class="btn-sm btn-wa reshare-btn" data-idx="${idx}">📱 Share WA</button>
                             </div>
                          </div>`;
             });
             histDiv.innerHTML = html;
-            document.querySelectorAll('.reprint-btn').forEach(btn => btn.addEventListener('click', (e) => { const idx = parseInt(btn.dataset.idx); printStruk(transactionHistory[idx]); }));
+            document.querySelectorAll('.reprint-web-btn').forEach(btn => btn.addEventListener('click', (e) => { const idx = parseInt(btn.dataset.idx); printWeb(transactionHistory[idx]); }));
+            document.querySelectorAll('.reprint-bt-btn').forEach(btn => btn.addEventListener('click', async (e) => { const idx = parseInt(btn.dataset.idx); await printViaBluetooth(transactionHistory[idx]); }));
             document.querySelectorAll('.reshare-btn').forEach(btn => btn.addEventListener('click', (e) => { const idx = parseInt(btn.dataset.idx); shareWhatsApp(transactionHistory[idx]); }));
         }
         let allOmset = transactionHistory.reduce((a,b)=>a+b.totalOmset,0);
@@ -725,6 +848,7 @@ Barang yang sudah dibeli tidak dapat dikembalikan.</textarea>
     function showToast(msg,type) { let t=document.createElement('div'); t.innerText=msg; t.style.position='fixed'; t.style.bottom='20px'; t.style.right='20px'; t.style.backgroundColor=type==='success'?'#10b981':'#ef4444'; t.style.color='white'; t.style.padding='12px 24px'; t.style.borderRadius='40px'; t.style.zIndex='9999'; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
 
     // Event binding
+    document.getElementById('connectBluetoothBtn').addEventListener('click', connectBluetooth);
     document.getElementById('saveStrukSettingBtn').addEventListener('click', saveStrukSettings);
     document.getElementById('downloadExcelBtn').addEventListener('click', downloadStockExcel);
     document.getElementById('uploadExcelInput').addEventListener('change', (e) => { if(e.target.files.length) importExcel(e.target.files[0]); e.target.value=''; });
