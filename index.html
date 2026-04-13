@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Kasir Pro+ </title>
+    <title>Kasir Kios Mama ADAM | Print via Bluetooth | Thermal 58mm</title>
     <!-- SheetJS (XLSX) untuk export/import Excel -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -25,7 +25,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
+            background: linear-gradient(135deg, #065f46, #047857, #059669);
             color: white;
             padding: 18px 28px;
             border-radius: 32px;
@@ -34,38 +34,136 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
-        .header h1 { font-size: 1.7rem; display: flex; align-items: center; gap: 12px; }
-        .date-box { background: rgba(255,255,255,0.18); padding: 8px 20px; border-radius: 60px; }
+        .header h1 { 
+            font-size: 1.7rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .datetime-box { 
+            background: rgba(255,255,255,0.2); 
+            padding: 8px 20px; 
+            border-radius: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            backdrop-filter: blur(5px);
+        }
+        .date-text { font-size: 0.9rem; }
+        .time-text { font-size: 1.1rem; font-weight: bold; letter-spacing: 1px; }
+        .time-label { font-size: 0.7rem; margin-right: 5px; font-weight: normal; }
 
-        .storage-card {
+        /* Memory Card */
+        .memory-card {
             background: linear-gradient(135deg, #1e293b, #0f172a);
             color: white;
             border-radius: 28px;
-            padding: 16px 24px;
+            padding: 12px 24px;
             margin-bottom: 28px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 24px;
             flex-wrap: wrap;
-            gap: 16px;
+            justify-content: space-between;
         }
-        .storage-info { display: flex; gap: 28px; flex-wrap: wrap; }
-        .storage-item { background: rgba(255,255,255,0.12); padding: 8px 20px; border-radius: 40px; }
-        .btn-reset-storage { background: #ef4444; padding: 8px 20px; border-radius: 40px; }
+        .memory-info { display: flex; gap: 20px; flex-wrap: wrap; }
+        .memory-item { 
+            background: rgba(255,255,255,0.12); 
+            padding: 8px 18px; 
+            border-radius: 40px; 
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .memory-item span:first-child { font-weight: 600; }
+        .memory-item span:last-child { font-weight: 700; color: #a7f3d0; }
+        .btn-reset-storage { 
+            background: #ef4444; 
+            padding: 8px 20px; 
+            border-radius: 40px; 
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+        .btn-reset-storage:hover { transform: scale(0.97); opacity: 0.9; }
 
-        .total-stock-card {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
+        /* STATS ROW - 4 kolom */
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: white;
+            flex: 1;
+            min-width: 200px;
+            border-radius: 32px;
+            padding: 20px 24px;
+            border-left: 8px solid;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+        }
+        .stat-card.omset { border-left-color: #3b82f6; }
+        .stat-card.laba { border-left-color: #10b981; }
+        .stat-card.transaksi { border-left-color: #8b5cf6; }
+        .stat-card.total-stok { border-left-color: #059669; background: linear-gradient(135deg, #ffffff, #f0fdf4); }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: #0f172a; }
+        .stat-label { font-size: 0.75rem; color: #64748b; margin-top: 4px; }
+        .stat-sub { font-size: 0.7rem; color: #64748b; margin-top: 8px; }
+
+        /* FILTER SECTION + BLUETOOTH */
+        .filter-bluetooth-section {
+            background: white;
             border-radius: 28px;
             padding: 20px 28px;
             margin-bottom: 28px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
             flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            justify-content: space-between;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.05);
         }
-        .total-stock-value { font-size: 2.2rem; font-weight: 800; background: rgba(255,255,255,0.2); padding: 8px 24px; border-radius: 60px; }
+        .filter-group { 
+            display: flex; 
+            gap: 16px; 
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .filter-item { display: flex; flex-direction: column; gap: 6px; }
+        .filter-item label { font-weight: 600; color: #334155; font-size: 0.8rem; }
+        .filter-item input { padding: 10px 14px; border-radius: 24px; border: 1px solid #cbd5e1; }
+        
+        .bluetooth-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-start;
+        }
+        .bluetooth-group label {
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.8rem;
+        }
+        .btn-bluetooth { 
+            background: #3b82f6; 
+            padding: 10px 24px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .bluetooth-status {
+            font-size: 0.7rem;
+            color: #475569;
+            margin-top: 4px;
+        }
 
         /* Setting Struk Card */
         .setting-struk-card {
@@ -104,68 +202,10 @@
         }
         .setting-item textarea { width: 260px; resize: vertical; }
         .btn-save-setting { background: #10b981; padding: 10px 24px; }
-        .btn-bluetooth { background: #3b82f6; padding: 10px 24px; display: inline-flex; align-items: center; gap: 8px; }
-        .bluetooth-status {
-            font-size: 0.75rem;
-            margin-top: 4px;
-            color: #475569;
-        }
-
-        .excel-tools {
-            background: white;
-            border-radius: 28px;
-            padding: 16px 28px;
-            margin-bottom: 28px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .excel-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
-        .btn-excel { background: #1e7e34; }
-        .btn-excel-import { background: #8b5cf6; }
-        .file-label { background: #3b82f6; padding: 8px 20px; border-radius: 40px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-        .file-label input { display: none; }
-
-        .filter-section {
-            background: white;
-            border-radius: 28px;
-            padding: 20px 28px;
-            margin-bottom: 28px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            align-items: flex-end;
-            justify-content: space-between;
-        }
-        .filter-group { display: flex; gap: 16px; flex-wrap: wrap; }
-        .filter-item { display: flex; flex-direction: column; gap: 6px; }
-        .filter-item label { font-weight: 600; color: #334155; font-size: 0.8rem; }
-        .filter-item input { padding: 10px 14px; border-radius: 24px; border: 1px solid #cbd5e1; }
-
-        .stats-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-        }
-        .stat-card {
-            background: white;
-            flex: 1;
-            min-width: 210px;
-            border-radius: 32px;
-            padding: 20px 24px;
-            border-left: 8px solid;
-        }
-        .stat-card.omset { border-left-color: #3b82f6; }
-        .stat-card.laba { border-left-color: #10b981; }
-        .stat-card.transaksi { border-left-color: #8b5cf6; }
-        .stat-value { font-size: 2rem; font-weight: 800; color: #0f172a; }
 
         .two-columns { display: flex; gap: 24px; flex-wrap: wrap; }
         .col { flex: 1; min-width: 340px; }
-        .card { background: white; border-radius: 28px; overflow: hidden; margin-bottom: 24px; }
+        .card { background: white; border-radius: 28px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 6px 14px rgba(0,0,0,0.05); }
         .card-header {
             background: #f8fafc;
             padding: 16px 24px;
@@ -181,6 +221,21 @@
         .card-header .search-stock-box input { padding: 8px 14px; border-radius: 40px; border: 1px solid #cbd5e1; width: 200px; }
         .card-header .search-stock-box button { padding: 8px 16px; background: #3b82f6; }
         .card-body { padding: 20px 24px; }
+        
+        /* Excel buttons di dalam card stok */
+        .stock-excel-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            flex-wrap: wrap;
+        }
+        .btn-excel { background: #1e7e34; }
+        .btn-excel-import { background: #8b5cf6; }
+        .file-label { background: #3b82f6; padding: 8px 20px; border-radius: 40px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+        .file-label input { display: none; }
+        
         input, select { width: 100%; padding: 12px 14px; border-radius: 24px; border: 1px solid #cbd5e1; }
         button { background: #0f172a; color: white; border: none; padding: 10px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         button:hover { transform: scale(0.97); opacity: 0.9; }
@@ -208,6 +263,19 @@
         .text-muted { color: #475569; font-size: 0.8rem; }
         .action-icons { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 
+        /* History buttons di dalam card keranjang */
+        .history-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .history-buttons button {
+            flex: 1;
+            justify-content: center;
+        }
+
         /* STRUK THERMAL 58mm */
         .struk-print {
             font-family: 'Courier New', 'Courier', monospace;
@@ -226,35 +294,70 @@
         .struk-print .item-name { text-align: left; }
         .struk-print .item-price { text-align: right; white-space: nowrap; }
         .struk-footer-custom { text-align: center; margin-top: 8px; font-size: 9px; white-space: pre-line; }
+        
+        .memory-total {
+            background: #059669;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 <div class="dashboard">
     <div class="header">
-        <h1>🏪 Kasir Kios Mama ADAM</h1>
-        <div class="date-box" id="currentDate"></div>
-    </div>
-
-    <div class="storage-card">
-        <div class="storage-info">
-            <div class="storage-item"><span>💾 Memori Terpakai:</span> <span id="usedMemory">0 KB</span></div>
-            <div class="storage-item"><span>📀 Sisa Memori:</span> <span id="remainingMemory">~5 MB</span></div>
-            <div class="storage-item"><span>📦 Data Size:</span> <span id="dataSize">0 KB</span></div>
+        <h1>🏪 Kasir Kios Mama ADAM | Print Bluetooth | Thermal 58mm</h1>
+        <div class="datetime-box">
+            <div class="date-text" id="currentDate"></div>
+            <div class="time-text"><span class="time-label">Jam / Pukul :</span> <span id="currentTime"></span></div>
         </div>
-        <button id="resetAllDataBtn" class="btn-reset-storage">⚠️ Reset Semua Data</button>
     </div>
 
-    <div class="total-stock-card">
-        <div>🏦 TOTAL NILAI SELURUH STOK (HARGA MODAL)</div>
-        <div class="total-stock-value" id="totalStockValueDisplay">Rp 0</div>
+    <!-- STATISTIK OMSET, LABA, TRANSAKSI + TOTAL NILAI STOK -->
+    <div class="stats-row">
+        <div class="stat-card omset">
+            <div class="stat-value" id="filteredOmset">Rp 0</div>
+            <div class="stat-label">💰 OMSET (Periode)</div>
+            <div class="stat-sub" id="filterRangeLabel">Seluruh waktu</div>
+        </div>
+        <div class="stat-card laba">
+            <div class="stat-value" id="filteredLaba">Rp 0</div>
+            <div class="stat-label">📈 LABA BERSIH</div>
+        </div>
+        <div class="stat-card transaksi">
+            <div class="stat-value" id="filteredTransCount">0</div>
+            <div class="stat-label">🔄 TRANSAKSI</div>
+        </div>
+        <div class="stat-card total-stok">
+            <div class="stat-value" id="totalStockValueDisplay">Rp 0</div>
+            <div class="stat-label">🏦 TOTAL NILAI STOK (HARGA MODAL)</div>
+        </div>
     </div>
 
-    <!-- PENGATURAN STRUK & BLUETOOTH -->
+    <!-- FILTER TANGGAL + BLUETOOTH -->
+    <div class="filter-bluetooth-section">
+        <div class="filter-group">
+            <div class="filter-item"><label>📅 Dari Tanggal</label><input type="date" id="startDate"></div>
+            <div class="filter-item"><label>📅 Sampai Tanggal</label><input type="date" id="endDate"></div>
+            <button id="applyFilterBtn" class="btn-primary">🔍 Tampilkan</button>
+            <button id="resetFilterBtn" style="background:#64748b;">⟳ Reset Filter</button>
+        </div>
+        
+        <div class="bluetooth-group">
+            <label>🖨️ Printer Bluetooth</label>
+            <button id="connectBluetoothBtn" class="btn-bluetooth">🔷 Connect Bluetooth Printer</button>
+            <div id="bluetoothStatus" class="bluetooth-status">Belum terhubung</div>
+        </div>
+    </div>
+
+    <!-- PENGATURAN STRUK -->
     <div class="setting-struk-card">
         <div class="setting-group">
             <div class="setting-item">
                 <label>🏪 Nama Toko</label>
-                <input type="text" id="shopNameInput" placeholder="Nama Toko" value="TOKO MAJU JAYA">
+                <input type="text" id="shopNameInput" placeholder="Nama Toko" value="Kios Mama ADAM">
             </div>
             <div class="setting-item">
                 <label>📝 Footer / Catatan</label>
@@ -265,74 +368,85 @@
                 <input type="text" id="whatsappNumberInput" placeholder="628123456789">
             </div>
         </div>
-        <div>
-            <button id="connectBluetoothBtn" class="btn-bluetooth">🔷 Connect Bluetooth Printer</button>
-            <div id="bluetoothStatus" class="bluetooth-status">Belum terhubung</div>
-        </div>
         <button id="saveStrukSettingBtn" class="btn-save-setting">💾 Simpan Pengaturan</button>
     </div>
 
-    <div class="excel-tools">
-        <div class="excel-buttons">
-            <button id="downloadExcelBtn" class="btn-excel">📎 Download Stok (Excel)</button>
-            <label class="file-label btn-excel-import">📂 Upload Excel Stok <input type="file" id="uploadExcelInput" accept=".xlsx, .xls, .csv"></label>
+    <!-- MEMORY CARD dengan Total Memori -->
+    <div class="memory-card">
+        <div class="memory-info">
+            <div class="memory-item">
+                <span>💾 Memori Terpakai:</span>
+                <span id="usedMemory">0 KB</span>
+            </div>
+            <div class="memory-item">
+                <span>📀 Sisa Memori:</span>
+                <span id="remainingMemory">~5 MB</span>
+            </div>
+            <div class="memory-item">
+                <span>📦 Ukuran Data:</span>
+                <span id="dataSize">0 KB</span>
+            </div>
+            <div class="memory-item">
+                <span>💿 Total Memori:</span>
+                <span id="totalMemory">5 MB</span>
+            </div>
         </div>
-        <div class="text-muted">Format: Kode, Nama Barang, Harga Jual, Harga Modal, Stok</div>
-    </div>
-
-    <div class="filter-section">
-        <div class="filter-group">
-            <div class="filter-item"><label>📅 Dari Tanggal</label><input type="date" id="startDate"></div>
-            <div class="filter-item"><label>📅 Sampai Tanggal</label><input type="date" id="endDate"></div>
-            <button id="applyFilterBtn" class="btn-primary">🔍 Tampilkan</button>
-            <button id="resetFilterBtn" style="background:#64748b;">⟳ Reset Filter</button>
-        </div>
-        <div style="display: flex; gap: 12px;">
-            <button id="showHistoryModalBtn" style="background:#8b5cf6;">📋 Lihat Riwayat</button>
-            <button id="resetHistoryOnlyBtn" style="background:#f59e0b; color:#1e293b;">🗑️ Reset Riwayat</button>
-        </div>
-    </div>
-
-    <div class="stats-row">
-        <div class="stat-card omset"><h3>💰 OMSET (Periode)</h3><div class="stat-value" id="filteredOmset">Rp 0</div><div class="stat-sub" id="filterRangeLabel">Seluruh waktu</div></div>
-        <div class="stat-card laba"><h3>📈 LABA BERSIH</h3><div class="stat-value" id="filteredLaba">Rp 0</div></div>
-        <div class="stat-card transaksi"><h3>🔄 TRANSAKSI</h3><div class="stat-value" id="filteredTransCount">0</div></div>
+        <button id="resetAllDataBtn" class="btn-reset-storage">⚠️ Reset Semua Data</button>
     </div>
 
     <div class="two-columns">
         <div class="col">
-            <div class="card"><div class="card-header">🛒 Kasir</div><div class="card-body">
-                <select id="productSelect"></select>
-                <div style="display:flex; gap:8px; margin-top:12px;"><input type="text" id="searchProductInput" placeholder="Cari barang..."><button id="searchProductBtn" class="btn-primary btn-sm">🔍</button></div>
-                <div style="margin:12px 0;"><label>Jumlah</label><input type="number" id="qtyInput" value="1" min="1"></div>
-                <button id="addToCartBtn" class="btn-primary">➕ Tambah ke Keranjang</button>
-            </div></div>
-            <div class="card"><div class="card-header">🛍️ Keranjang</div><div class="card-body">
-                <div id="cartList"><div class="empty-cart">Keranjang kosong</div></div>
-                <div id="cartSummary" style="display:none;">
-                    <div class="cart-total"><div class="flex-between"><span>Total:</span><span class="grand-total" id="cartTotalAmount">Rp 0</span></div></div>
-                    <div style="display:flex; gap:12px; margin-top:18px; flex-wrap:wrap;">
-                        <button id="checkoutBtn" class="btn-success">✅ Bayar</button>
-                        <button id="clearCartBtn" class="btn-danger">🗑️ Kosongkan</button>
+            <div class="card">
+                <div class="card-header">🛒 Kasir</div>
+                <div class="card-body">
+                    <select id="productSelect"></select>
+                    <div style="display:flex; gap:8px; margin-top:12px;"><input type="text" id="searchProductInput" placeholder="Cari barang..."><button id="searchProductBtn" class="btn-primary btn-sm">🔍</button></div>
+                    <div style="margin:12px 0;"><label>Jumlah</label><input type="number" id="qtyInput" value="1" min="1"></div>
+                    <button id="addToCartBtn" class="btn-primary">➕ Tambah ke Keranjang</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">🛍️ Keranjang</div>
+                <div class="card-body">
+                    <div id="cartList"><div class="empty-cart">Keranjang kosong</div></div>
+                    <div id="cartSummary" style="display:none;">
+                        <div class="cart-total"><div class="flex-between"><span>Total:</span><span class="grand-total" id="cartTotalAmount">Rp 0</span></div></div>
+                        <div style="display:flex; gap:12px; margin-top:18px; flex-wrap:wrap;">
+                            <button id="checkoutBtn" class="btn-success">✅ Bayar</button>
+                            <button id="clearCartBtn" class="btn-danger">🗑️ Kosongkan</button>
+                        </div>
+                    </div>
+                    <div class="history-buttons">
+                        <button id="showHistoryModalBtn" style="background:#8b5cf6; flex:1;">📋 Riwayat Transaksi</button>
+                        <button id="resetHistoryOnlyBtn" style="background:#f59e0b; color:#1e293b; flex:1;">🗑️ Reset Riwayat</button>
                     </div>
                 </div>
-            </div></div>
+            </div>
         </div>
         <div class="col">
             <div class="card">
                 <div class="card-header">
                     📦 Stok Barang
                     <div class="search-stock-box">
-                        <input type="text" id="stockSearchInput" placeholder="Cari kode/nama...">
+                        <input type="text" id="stockSearchInput" placeholder="Cari nama barang...">
                         <button id="stockSearchBtn" class="btn-sm">🔍 Cari</button>
                         <button id="stockResetBtn" class="btn-sm" style="background:#64748b;">↺ Reset</button>
                     </div>
                     <button id="openAddProductModalBtn" style="background:#10b981;" class="btn-sm">+ Barang</button>
                 </div>
                 <div class="card-body">
+                    <!-- MENU UPLOAD DAN DOWNLOAD EXCEL -->
+                    <div class="stock-excel-buttons">
+                        <button id="downloadExcelBtn" class="btn-excel">📎 Download Stok (Excel)</button>
+                        <label class="file-label btn-excel-import">📂 Upload Excel Stok <input type="file" id="uploadExcelInput" accept=".xlsx, .xls, .csv"></label>
+                        <div class="text-muted" style="font-size:0.7rem; margin-left: auto; align-self: center;">Format: Nama, Harga Jual, Harga Modal, Stok</div>
+                    </div>
+                    
                     <div style="overflow-x:auto;">
                         <table id="stockTable">
-                            <thead><tr><th>Kode</th><th>Nama</th><th>Harga Jual</th><th>Modal</th><th>Stok</th><th>Nilai Stok</th><th>Aksi</th></thead>
+                            <thead>
+                                <tr><th>Nama Barang</th><th>Harga Jual</th><th>Modal</th><th>Stok</th><th>Nilai Stok</th><th>Aksi</th></tr>
+                            </thead>
                             <tbody id="stockTableBody"></tbody>
                         </table>
                     </div>
@@ -344,7 +458,7 @@
 </div>
 
 <!-- Modal Produk -->
-<div id="productModal" class="modal-overlay"><div class="modal-container"><h3 id="modalTitle">Tambah/Edit Barang</h3><input type="hidden" id="editId"><div><label>Kode</label><input id="modalCode"></div><div><label>Nama</label><input id="modalName"></div><div><label>Harga Jual</label><input id="modalPrice" type="number"></div><div><label>Harga Modal</label><input id="modalCost" type="number" value="0"></div><div><label>Stok</label><input id="modalStock" type="number"></div><div style="display:flex; gap:12px; justify-content:flex-end; margin-top:20px;"><button id="closeModalBtn" style="background:#94a3b8;">Batal</button><button id="saveProductBtn" style="background:#3b82f6;">Simpan</button></div></div></div>
+<div id="productModal" class="modal-overlay"><div class="modal-container"><h3 id="modalTitle">Tambah/Edit Barang</h3><input type="hidden" id="editId"><div><label>Kode</label><input id="modalCode" placeholder="Kode barang (opsional)"></div><div><label>Nama Barang</label><input id="modalName"></div><div><label>Harga Jual</label><input id="modalPrice" type="number"></div><div><label>Harga Modal</label><input id="modalCost" type="number" value="0"></div><div><label>Stok</label><input id="modalStock" type="number"></div><div style="display:flex; gap:12px; justify-content:flex-end; margin-top:20px;"><button id="closeModalBtn" style="background:#94a3b8;">Batal</button><button id="saveProductBtn" style="background:#3b82f6;">Simpan</button></div></div></div>
 
 <!-- Modal Riwayat -->
 <div id="historyModal" class="modal-overlay"><div class="modal-container"><h3>📜 Riwayat Transaksi</h3><div id="historyList" style="max-height:400px; overflow:auto;"></div><div style="background:#f1f5f9; padding:16px; border-radius:28px; margin-top:12px;"><div class="flex-between"><strong>Total Omset:</strong> <span id="allTimeOmset">Rp 0</span></div><div class="flex-between"><strong>Total Laba:</strong> <span id="allTimeLaba">Rp 0</span></div></div><button id="closeHistoryBtn" class="close-modal-btn" style="margin-top:16px;">Tutup</button></div></div>
@@ -357,7 +471,7 @@
     let stockFilterKeyword = "";
     
     // Pengaturan Struk
-    let shopName = "TOKO MAJU JAYA";
+    let shopName = "Kios Mama ADAM";
     let footerText = "Terima kasih telah berbelanja!";
     let whatsappNumber = "";
 
@@ -365,6 +479,9 @@
     let bluetoothDevice = null;
     let bluetoothCharacteristic = null;
     let isBluetoothConnected = false;
+
+    // Konstanta total memori (dalam bytes)
+    const TOTAL_MEMORY_LIMIT = 5 * 1024 * 1024; // 5 MB
 
     // ======================== STORAGE ========================
     function saveToLocalStorage() {
@@ -381,7 +498,7 @@
                 const parsed = JSON.parse(saved);
                 products = parsed.products || [];
                 transactionHistory = parsed.transactionHistory || [];
-                shopName = parsed.shopName || "TOKO MAJU JAYA";
+                shopName = parsed.shopName || "Kios Mama ADAM";
                 footerText = parsed.footerText || "Terima kasih telah berbelanja!";
                 whatsappNumber = parsed.whatsappNumber || "";
                 if (products.length === 0) setDefaultProducts();
@@ -417,7 +534,7 @@
     }
 
     function saveStrukSettings() {
-        shopName = document.getElementById('shopNameInput').value.trim() || "TOKO KASIR";
+        shopName = document.getElementById('shopNameInput').value.trim() || "Kios Mama ADAM";
         footerText = document.getElementById('footerTextInput').value || "Terima kasih!";
         whatsappNumber = document.getElementById('whatsappNumberInput').value.trim();
         saveToLocalStorage();
@@ -427,17 +544,42 @@
     function updateStorageDisplay() {
         try {
             const data = { products, transactionHistory, shopName, footerText, whatsappNumber };
-            const sizeKB = (new Blob([JSON.stringify(data)]).size / 1024).toFixed(2);
+            const sizeBytes = new Blob([JSON.stringify(data)]).size;
+            const sizeKB = (sizeBytes / 1024).toFixed(2);
+            const usedMB = sizeBytes / (1024 * 1024);
+            const remainingMB = (TOTAL_MEMORY_LIMIT / (1024 * 1024) - usedMB).toFixed(2);
+            
             document.getElementById('usedMemory').innerText = `${sizeKB} KB`;
             document.getElementById('dataSize').innerText = `${sizeKB} KB`;
-            const usedMB = sizeKB / 1024;
-            const remaining = (5 - usedMB).toFixed(2);
-            document.getElementById('remainingMemory').innerHTML = `~${remaining} MB (dari 5 MB)`;
-        } catch(e) {}
+            document.getElementById('remainingMemory').innerHTML = `~${remainingMB} MB`;
+            document.getElementById('totalMemory').innerHTML = `5 MB`;
+        } catch(e) {
+            console.error("Error updating storage display:", e);
+        }
     }
 
     function hitungTotalNilaiStok() { return products.reduce((a,b)=>a+((b.cost||0)*(b.stock||0)),0); }
-    function updateTotalStockValue() { document.getElementById('totalStockValueDisplay').innerHTML = formatRupiah(hitungTotalNilaiStok()); }
+    function updateTotalStockValue() { 
+        const totalStokElem = document.getElementById('totalStockValueDisplay');
+        if (totalStokElem) {
+            totalStokElem.innerHTML = formatRupiah(hitungTotalNilaiStok());
+        }
+    }
+
+    // ======================== JAM HIDUP ========================
+    function updateDateTime() {
+        const now = new Date();
+        const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateString = now.toLocaleDateString('id-ID', optionsDate);
+        const timeString = now.toLocaleTimeString('id-ID', { hour12: false });
+        
+        document.getElementById('currentDate').innerHTML = dateString;
+        document.getElementById('currentTime').innerHTML = timeString;
+    }
+    
+    // Jalankan update jam setiap detik
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
 
     // ======================== BLUETOOTH PRINT ========================
     async function connectBluetooth() {
@@ -447,7 +589,7 @@
         }
         try {
             const device = await navigator.bluetooth.requestDevice({
-                filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }], // Service printer umum
+                filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
                 optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
             });
             bluetoothDevice = device;
@@ -596,9 +738,8 @@
         const rows = document.querySelectorAll('#stockTableBody .data-row');
         let visible = 0;
         rows.forEach(row => {
-            const code = row.getAttribute('data-code') || "";
             const name = row.getAttribute('data-name') || "";
-            if (keyword === "" || code.includes(keyword) || name.includes(keyword)) {
+            if (keyword === "" || name.includes(keyword)) {
                 row.style.display = "";
                 visible++;
             } else {
@@ -610,7 +751,7 @@
 
     // ======================== EXCEL ========================
     function downloadStockExcel() {
-        const stockData = products.map(p => ({ "Kode": p.code, "Nama Barang": p.name, "Harga Jual": p.price, "Harga Modal": p.cost, "Stok": p.stock, "Nilai Stok": p.cost * p.stock }));
+        const stockData = products.map(p => ({ "Nama Barang": p.name, "Harga Jual": p.price, "Harga Modal": p.cost, "Stok": p.stock, "Nilai Stok": p.cost * p.stock }));
         const ws = XLSX.utils.json_to_sheet(stockData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Stok_Barang");
@@ -625,12 +766,12 @@
             const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
             let newProducts = [];
             for (let row of rows) {
-                let code = row["Kode"] || row["kode"] || "";
+                let code = row["Kode"] || row["kode"] || "BRG" + Date.now() + Math.random().toString(36).substring(2, 6);
                 let name = row["Nama Barang"] || row["nama"] || "";
                 let price = parseFloat(row["Harga Jual"] || row["harga"] || 0);
                 let cost = parseFloat(row["Harga Modal"] || row["modal"] || 0);
                 let stock = parseInt(row["Stok"] || row["stok"] || 0);
-                if (code && name) newProducts.push({ id: generateId(), code: String(code).trim(), name: String(name).trim(), price: isNaN(price)?0:price, cost: isNaN(cost)?0:cost, stock: isNaN(stock)?0:stock });
+                if (name) newProducts.push({ id: generateId(), code: String(code).trim(), name: String(name).trim(), price: isNaN(price)?0:price, cost: isNaN(cost)?0:cost, stock: isNaN(stock)?0:stock });
             }
             if (newProducts.length) { products = newProducts; saveToLocalStorage(); renderAll(); showToast(`Import ${newProducts.length} barang`, "success"); }
             else alert("Tidak ada data valid");
@@ -666,21 +807,19 @@
 
     function renderStockTable() {
         const tbody = document.getElementById('stockTableBody');
-        if (!products.length) { tbody.innerHTML = '<tr><td colspan="7">Tidak ada数据</td></tr>'; return; }
+        if (!products.length) { tbody.innerHTML = '<tr><td colspan="6">Tidak ada数据</td></tr>'; return; }
         tbody.innerHTML = '';
         products.forEach(prod => {
             const row = tbody.insertRow();
             row.className = 'data-row';
-            row.setAttribute('data-code', prod.code.toLowerCase());
             row.setAttribute('data-name', prod.name.toLowerCase());
-            row.insertCell(0).innerText = prod.code;
-            row.insertCell(1).innerText = prod.name;
-            row.insertCell(2).innerText = formatRupiah(prod.price);
-            row.insertCell(3).innerText = formatRupiah(prod.cost || 0);
+            row.insertCell(0).innerText = prod.name;
+            row.insertCell(1).innerText = formatRupiah(prod.price);
+            row.insertCell(2).innerText = formatRupiah(prod.cost || 0);
             let cls = prod.stock <= 0 ? 'stock-low' : (prod.stock > 20 ? 'stock-high' : 'stock-medium');
-            row.insertCell(4).innerHTML = `<span class="stock-badge ${cls}">${prod.stock}</span>`;
-            row.insertCell(5).innerHTML = `<strong style="color:#d97706;">${formatRupiah((prod.cost||0)*(prod.stock||0))}</strong>`;
-            row.insertCell(6).innerHTML = `<button class="btn-sm edit-product" data-id="${prod.id}" style="background:#3b82f6;">✏️ Edit</button> <button class="btn-sm delete-product" data-id="${prod.id}" style="background:#ef4444;">🗑️</button>`;
+            row.insertCell(3).innerHTML = `<span class="stock-badge ${cls}">${prod.stock}</span>`;
+            row.insertCell(4).innerHTML = `<strong style="color:#d97706;">${formatRupiah((prod.cost||0)*(prod.stock||0))}</strong>`;
+            row.insertCell(5).innerHTML = `<button class="btn-sm edit-product" data-id="${prod.id}" style="background:#3b82f6;">✏️ Edit</button> <button class="btn-sm delete-product" data-id="${prod.id}" style="background:#ef4444;">🗑️</button>`;
         });
         document.querySelectorAll('.edit-product').forEach(btn => btn.addEventListener('click', (e) => openEditModal(btn.dataset.id)));
         document.querySelectorAll('.delete-product').forEach(btn => btn.addEventListener('click', (e) => {
@@ -692,7 +831,7 @@
     function renderProductSelect() {
         const sel = document.getElementById('productSelect');
         sel.innerHTML = '<option value="">-- Pilih Barang --</option>';
-        products.forEach(p => { let opt = document.createElement('option'); opt.value = p.id; opt.textContent = `${p.code} - ${p.name} | Stok:${p.stock} | ${formatRupiah(p.price)}`; sel.appendChild(opt); });
+        products.forEach(p => { let opt = document.createElement('option'); opt.value = p.id; opt.textContent = `${p.name} | Stok:${p.stock} | ${formatRupiah(p.price)}`; sel.appendChild(opt); });
     }
 
     function renderCart() {
@@ -792,7 +931,7 @@
         let kw = document.getElementById('searchProductInput').value.toLowerCase();
         let sel = document.getElementById('productSelect');
         sel.innerHTML = '<option value="">-- Pilih Barang --</option>';
-        products.forEach(p => { if (p.name.toLowerCase().includes(kw) || p.code.toLowerCase().includes(kw) || kw === '') { let opt = document.createElement('option'); opt.value = p.id; opt.textContent = `${p.code} - ${p.name} (Stok:${p.stock})`; sel.appendChild(opt); } });
+        products.forEach(p => { if (p.name.toLowerCase().includes(kw) || kw === '') { let opt = document.createElement('option'); opt.value = p.id; opt.textContent = `${p.name} (Stok:${p.stock})`; sel.appendChild(opt); } });
     }
 
     function showHistoryModal() {
@@ -828,14 +967,14 @@
     function openEditModal(id) { let p = products.find(p=>p.id===id); if(!p) return; document.getElementById('modalTitle').innerText = 'Edit Barang'; document.getElementById('editId').value = p.id; document.getElementById('modalCode').value = p.code; document.getElementById('modalName').value = p.name; document.getElementById('modalPrice').value = p.price; document.getElementById('modalCost').value = p.cost||0; document.getElementById('modalStock').value = p.stock; document.getElementById('productModal').style.display='flex'; }
     function saveProduct() {
         let id = document.getElementById('editId').value;
-        let code = document.getElementById('modalCode').value.trim();
+        let code = document.getElementById('modalCode').value.trim() || "BRG" + Date.now().toString(36).substring(2, 6);
         let name = document.getElementById('modalName').value.trim();
         let price = parseInt(document.getElementById('modalPrice').value);
         let cost = parseInt(document.getElementById('modalCost').value);
         let stock = parseInt(document.getElementById('modalStock').value);
-        if (!code || !name || isNaN(price) || isNaN(stock)) { alert("Data lengkap"); return; }
-        if (id) { let idx = products.findIndex(p=>p.id===id); if(idx!==-1){ if(products.some(p=>p.code===code && p.id!==id)){ alert("Kode duplikat"); return; } products[idx] = {...products[idx], code, name, price, cost, stock}; cart = cart.filter(c=>c.productId!==id); showToast("Produk diupdate","success"); } }
-        else { if(products.some(p=>p.code===code)){ alert("Kode sudah ada"); return; } products.push({ id:generateId(), code, name, price, cost, stock }); showToast("Barang ditambahkan","success"); }
+        if (!name || isNaN(price) || isNaN(stock)) { alert("Nama barang, harga, dan stok wajib diisi"); return; }
+        if (id) { let idx = products.findIndex(p=>p.id===id); if(idx!==-1){ products[idx] = {...products[idx], code, name, price, cost, stock}; cart = cart.filter(c=>c.productId!==id); showToast("Produk diupdate","success"); } }
+        else { products.push({ id:generateId(), code, name, price, cost, stock }); showToast("Barang ditambahkan","success"); }
         closeModal(); saveToLocalStorage(); renderAll();
     }
     function closeModal() { document.getElementById('productModal').style.display='none'; }
@@ -844,7 +983,6 @@
     function resetAllData() { if(confirm("Reset SEMUA data?")) { localStorage.removeItem('kasir_app_data'); setDefaultProducts(); setSampleTransactions(); cart=[]; saveToLocalStorage(); renderAll(); showToast("Data direset","success"); } }
     function renderAll() { renderStockTable(); renderProductSelect(); renderCart(); updateFilteredStats(); filterProductSelect(); updateStorageDisplay(); updateTotalStockValue(); }
     function resetFilter() { document.getElementById('startDate').value=''; document.getElementById('endDate').value=''; updateFilteredStats(); showToast("Filter direset","success"); }
-    function updateDate() { document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
     function showToast(msg,type) { let t=document.createElement('div'); t.innerText=msg; t.style.position='fixed'; t.style.bottom='20px'; t.style.right='20px'; t.style.backgroundColor=type==='success'?'#10b981':'#ef4444'; t.style.color='white'; t.style.padding='12px 24px'; t.style.borderRadius='40px'; t.style.zIndex='9999'; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
 
     // Event binding
@@ -870,7 +1008,7 @@
     document.getElementById('stockSearchInput').addEventListener('keyup', (e) => { if(e.key === 'Enter') { stockFilterKeyword = document.getElementById('stockSearchInput').value; filterStockTable(); } });
     window.onclick = e => { if(e.target===document.getElementById('productModal')) closeModal(); if(e.target===document.getElementById('historyModal')) closeHistoryModal(); };
     
-    updateDate();
+    updateDateTime();
     loadFromLocalStorage();
     renderAll();
 </script>
