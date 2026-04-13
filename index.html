@@ -246,16 +246,70 @@
         .btn-wa { background: #25D366; }
         .btn-print { background: #6c757d; }
         .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+        
+        /* Tabel Keranjang dengan format baru */
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+        }
+        .cart-table th {
+            background: #f1f5f9;
+            padding: 10px 8px;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #334155;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .cart-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+            vertical-align: middle;
+        }
+        .cart-item-name { font-weight: 600; color: #0f172a; }
+        .cart-item-price, .cart-item-subtotal { font-family: monospace; font-weight: 600; color: #059669; }
+        .cart-item-qty { text-align: center; }
+        .cart-qty-btn {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            margin: 0 2px;
+        }
+        .cart-remove-btn {
+            background: #ef4444;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+        }
+        .cart-total-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px dashed #cbd5e1;
+            text-align: right;
+        }
+        .grand-total-label {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .grand-total-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #059669;
+            margin-left: 16px;
+        }
+        .empty-cart {
+            text-align: center;
+            color: #94a3b8;
+            padding: 40px;
+        }
+        
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px 8px; border-bottom: 1px solid #e2e8f0; text-align: left; }
         th { background: #f1f5f9; }
         .stock-badge { padding: 4px 12px; border-radius: 40px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
         .stock-high { background: #d1fae5; color: #065f46; }
         .stock-low { background: #fee2e2; color: #991b1b; }
-        .cart-item { background: #f8fafc; padding: 12px 15px; border-radius: 20px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .cart-total { margin-top: 16px; padding-top: 16px; border-top: 2px dashed #cbd5e1; text-align: right; font-weight: 800; }
-        .empty-cart { text-align: center; color: #94a3b8; padding: 30px; }
-        .grand-total { font-size: 1.6rem; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(5px); }
         .modal-container { background: white; max-width: 800px; width: 92%; border-radius: 48px; padding: 28px; max-height: 85vh; overflow-y: auto; }
         .history-item { background: #f8fafc; border-radius: 28px; padding: 16px; margin-bottom: 16px; border-left: 6px solid #3b82f6; }
@@ -294,15 +348,6 @@
         .struk-print .item-name { text-align: left; }
         .struk-print .item-price { text-align: right; white-space: nowrap; }
         .struk-footer-custom { text-align: center; margin-top: 8px; font-size: 9px; white-space: pre-line; }
-        
-        .memory-total {
-            background: #059669;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -371,7 +416,7 @@
         <button id="saveStrukSettingBtn" class="btn-save-setting">💾 Simpan Pengaturan</button>
     </div>
 
-    <!-- MEMORY CARD dengan Total Memori -->
+    <!-- MEMORY CARD -->
     <div class="memory-card">
         <div class="memory-info">
             <div class="memory-item">
@@ -406,14 +451,31 @@
                 </div>
             </div>
             <div class="card">
-                <div class="card-header">🛍️ Keranjang</div>
+                <div class="card-header">🛍️ Keranjang Belanja</div>
                 <div class="card-body">
-                    <div id="cartList"><div class="empty-cart">Keranjang kosong</div></div>
-                    <div id="cartSummary" style="display:none;">
-                        <div class="cart-total"><div class="flex-between"><span>Total:</span><span class="grand-total" id="cartTotalAmount">Rp 0</span></div></div>
-                        <div style="display:flex; gap:12px; margin-top:18px; flex-wrap:wrap;">
-                            <button id="checkoutBtn" class="btn-success">✅ Bayar</button>
-                            <button id="clearCartBtn" class="btn-danger">🗑️ Kosongkan</button>
+                    <div id="cartContainer">
+                        <div class="empty-cart" id="emptyCartMsg">Keranjang kosong</div>
+                        <div id="cartTableWrapper" style="display:none;">
+                            <table class="cart-table" id="cartTable">
+                                <thead>
+                                    <tr>
+                                        <th>Barang</th>
+                                        <th>Harga Jual</th>
+                                        <th style="text-align:center;">Jumlah</th>
+                                        <th>Subtotal</th>
+                                        <th style="text-align:center;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartTableBody"></tbody>
+                            </table>
+                            <div class="cart-total-section">
+                                <span class="grand-total-label">🛒 Total Belanja :</span>
+                                <span class="grand-total-value" id="cartTotalAmount">Rp 0</span>
+                            </div>
+                            <div style="display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;">
+                                <button id="checkoutBtn" class="btn-success" style="flex:1;">✅ Bayar</button>
+                                <button id="clearCartBtn" class="btn-danger" style="flex:1;">🗑️ Kosongkan</button>
+                            </div>
                         </div>
                     </div>
                     <div class="history-buttons">
@@ -435,13 +497,11 @@
                     <button id="openAddProductModalBtn" style="background:#10b981;" class="btn-sm">+ Barang</button>
                 </div>
                 <div class="card-body">
-                    <!-- MENU UPLOAD DAN DOWNLOAD EXCEL -->
                     <div class="stock-excel-buttons">
                         <button id="downloadExcelBtn" class="btn-excel">📎 Download Stok (Excel)</button>
                         <label class="file-label btn-excel-import">📂 Upload Excel Stok <input type="file" id="uploadExcelInput" accept=".xlsx, .xls, .csv"></label>
                         <div class="text-muted" style="font-size:0.7rem; margin-left: auto; align-self: center;">Format: Nama, Harga Jual, Harga Modal, Stok</div>
                     </div>
-                    
                     <div style="overflow-x:auto;">
                         <table id="stockTable">
                             <thead>
@@ -480,7 +540,7 @@
     let bluetoothCharacteristic = null;
     let isBluetoothConnected = false;
 
-    // Konstanta total memori (dalam bytes)
+    // Konstanta total memori
     const TOTAL_MEMORY_LIMIT = 5 * 1024 * 1024; // 5 MB
 
     // ======================== STORAGE ========================
@@ -577,7 +637,6 @@
         document.getElementById('currentTime').innerHTML = timeString;
     }
     
-    // Jalankan update jam setiap detik
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
@@ -807,7 +866,7 @@
 
     function renderStockTable() {
         const tbody = document.getElementById('stockTableBody');
-        if (!products.length) { tbody.innerHTML = '<tr><td colspan="6">Tidak ada数据</td></tr>'; return; }
+        if (!products.length) { tbody.innerHTML = '<tr><td colspan="6">Tidak ada data</td></tr>'; return; }
         tbody.innerHTML = '';
         products.forEach(prod => {
             const row = tbody.insertRow();
@@ -835,33 +894,76 @@
     }
 
     function renderCart() {
-        const cartDiv = document.getElementById('cartList');
-        const summaryDiv = document.getElementById('cartSummary');
-        if (!cart.length) { cartDiv.innerHTML = '<div class="empty-cart">Keranjang kosong</div>'; summaryDiv.style.display = 'none'; return; }
-        summaryDiv.style.display = 'block';
-        let html = '', total = 0;
+        const tbody = document.getElementById('cartTableBody');
+        const wrapper = document.getElementById('cartTableWrapper');
+        const emptyMsg = document.getElementById('emptyCartMsg');
+        
+        if (!cart.length) {
+            wrapper.style.display = 'none';
+            emptyMsg.style.display = 'block';
+            return;
+        }
+        
+        wrapper.style.display = 'block';
+        emptyMsg.style.display = 'none';
+        tbody.innerHTML = '';
+        let total = 0;
+        
         cart.forEach((item, idx) => {
-            const sub = item.price * item.qty;
-            total += sub;
-            html += `<div class="cart-item"><div><strong>${item.name}</strong><br>${formatRupiah(item.price)} x ${item.qty} = ${formatRupiah(sub)}</div>
-                    <div><button class="btn-sm cart-qty-minus" data-index="${idx}">-</button><span style="margin:0 6px;">${item.qty}</span><button class="btn-sm cart-qty-plus" data-index="${idx}">+</button><button class="btn-sm cart-remove" data-index="${idx}" style="background:#ef4444;">✖</button></div></div>`;
+            const subtotal = item.price * item.qty;
+            total += subtotal;
+            const row = tbody.insertRow();
+            row.insertCell(0).innerHTML = `<span class="cart-item-name">${item.name}</span>`;
+            row.insertCell(1).innerHTML = `<span class="cart-item-price">${formatRupiah(item.price)}</span>`;
+            row.insertCell(2).innerHTML = `
+                <div style="display:flex; align-items:center; justify-content:center; gap:4px;">
+                    <button class="btn-sm cart-qty-minus" data-index="${idx}" style="background:#3b82f6; padding:4px 10px;">-</button>
+                    <span style="min-width:30px; text-align:center; font-weight:600;">${item.qty}</span>
+                    <button class="btn-sm cart-qty-plus" data-index="${idx}" style="background:#3b82f6; padding:4px 10px;">+</button>
+                </div>
+            `;
+            row.insertCell(3).innerHTML = `<span class="cart-item-subtotal">${formatRupiah(subtotal)}</span>`;
+            row.insertCell(4).innerHTML = `<button class="btn-sm cart-remove-btn" data-index="${idx}">✖ Hapus</button>`;
         });
-        cartDiv.innerHTML = html;
+        
         document.getElementById('cartTotalAmount').innerHTML = formatRupiah(total);
-        attachCartEvents();
-    }
-
-    function attachCartEvents() {
-        document.querySelectorAll('.cart-qty-minus').forEach(btn => btn.addEventListener('click', () => {
-            let idx = parseInt(btn.dataset.index); if (cart[idx].qty > 1) cart[idx].qty--; else cart.splice(idx,1); renderAll(); saveToLocalStorage();
-        }));
-        document.querySelectorAll('.cart-qty-plus').forEach(btn => btn.addEventListener('click', () => {
-            let idx = parseInt(btn.dataset.index); let prod = products.find(p => p.id === cart[idx].productId);
-            if (prod && cart[idx].qty < prod.stock) cart[idx].qty++; else alert(`Stok habis!`); renderAll(); saveToLocalStorage();
-        }));
-        document.querySelectorAll('.cart-remove').forEach(btn => btn.addEventListener('click', () => {
-            let idx = parseInt(btn.dataset.index); cart.splice(idx,1); renderAll(); saveToLocalStorage();
-        }));
+        
+        // Re-attach events
+        document.querySelectorAll('.cart-qty-minus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                let idx = parseInt(btn.dataset.index);
+                if (cart[idx].qty > 1) {
+                    cart[idx].qty--;
+                } else {
+                    cart.splice(idx, 1);
+                }
+                renderAll();
+                saveToLocalStorage();
+            });
+        });
+        
+        document.querySelectorAll('.cart-qty-plus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                let idx = parseInt(btn.dataset.index);
+                let prod = products.find(p => p.id === cart[idx].productId);
+                if (prod && cart[idx].qty < prod.stock) {
+                    cart[idx].qty++;
+                } else {
+                    alert(`Stok ${cart[idx].name} habis!`);
+                }
+                renderAll();
+                saveToLocalStorage();
+            });
+        });
+        
+        document.querySelectorAll('.cart-remove-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                let idx = parseInt(btn.dataset.index);
+                cart.splice(idx, 1);
+                renderAll();
+                saveToLocalStorage();
+            });
+        });
     }
 
     function checkout() {
